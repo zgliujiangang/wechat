@@ -130,13 +130,9 @@ class MenuGroup(MenuBase):
             raise Exception("二级菜单最多不能超过5个，现有%s个二级菜单" % len(args))
         self.name = kwargs.pop("name")
         self.menu_list = args
-        self.no_sub = kwargs.get("no_sub", True)
     
     def menu(self):
-        if len(self.menu_list) == 1 and self.no_sub:
-            return self.menu_list[-1].menu()
-        else:
-            return {"name": self.name, "sub_button": [menu.menu() for menu in self.menu_list]}
+        return {"name": self.name, "sub_button": [menu.menu() for menu in self.menu_list]}
 
 class MenuGroups(object):
 
@@ -149,17 +145,19 @@ class MenuGroups(object):
 
 
 """
-from flask_wechat.menu import ClickMenu, ViewMenu, MenuGroup, MenuGroups
+from wechat.menu import ClickMenu, ViewMenu, MenuGroup, MenuGroups
 
 click1 = ClickMenu(name="你好", key="1111")
 click2 = ClickMenu(name="wwo", key='2222')
 view1 = ViewMenu(name='1111', url='http://www.hrjia.com')
 view2 = ViewMenu(name='2222', url='http://www.baidu.com')
+media = MediaMenu(name='xxs', media_id='111111111111111')
 
-group1 = MenuGroup(click1, view1, name='菜单1')
-group2 = MenuGroup(view2, click1, name2='菜单2')
+group1 = MenuGroup(click1, name='菜单1')
+group2 = MenuGroup(view2, click1, name='菜单2')
 
-menu = MenuGroups(group1, group2).menu
+menu1 = MenuGroups(group1, group2).menu
+menu2 = MenuGroups(click1, group2).menu
 
 print menu
 """
