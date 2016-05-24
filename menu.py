@@ -25,10 +25,10 @@ class MenuMeta(type):
 
 class MenuBase(object):
 
-    def convert(self):
-        menu = {"type": self.type, "name": self.name}
-        menu.update(self.params)
-        return menu
+    def menu(self):
+        menu_dict = {"type": self.type, "name": self.name}
+        menu_dict.update(self.params)
+        return menu_dict
 
 
 Menu = with_metaclass(MenuMeta, MenuBase)
@@ -123,7 +123,7 @@ class view_limitedMenu(Menu):
 
 
 # menu container
-class MenuGroup(object):
+class MenuGroup(MenuBase):
 
     def __init__(self, *args, **kwargs):
         if len(args) > 5:
@@ -134,9 +134,9 @@ class MenuGroup(object):
     
     def menu(self):
         if len(self.menu_list) == 1 and self.no_sub:
-            return self.menu_list[-1].convert()
+            return self.menu_list[-1].menu()
         else:
-            return {"name": self.name, "sub_button": [menu.convert() for menu in self.menu_list]}
+            return {"name": self.name, "sub_button": [menu.menu() for menu in self.menu_list]}
 
 class MenuGroups(object):
 
@@ -157,7 +157,7 @@ view1 = ViewMenu(name='1111', url='http://www.hrjia.com')
 view2 = ViewMenu(name='2222', url='http://www.baidu.com')
 
 group1 = MenuGroup(click1, view1, name='菜单1')
-group2 = MenuGroup(view2, click1, name='菜单2')
+group2 = MenuGroup(view2, click1, name2='菜单2')
 
 menu = MenuGroups(group1, group2).menu
 
