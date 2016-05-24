@@ -37,7 +37,7 @@ class ClickMenu(Menu):
 
     type = 'click'
     
-    def __init__(self, name, key):
+    def __init__(self, name=None, key=None):
         self.name = name
         self.params = {'key': key}
 
@@ -46,7 +46,7 @@ class ViewMenu(Menu):
 
     type = 'view'
     
-    def __init__(self, name, url):
+    def __init__(self, name=None, url=None):
         self.name = name
         self.params = {'url': url}
 
@@ -54,7 +54,7 @@ class MediaMenu(Menu):
 
     type = 'media_id'
     
-    def __init__(self, name, media_id):
+    def __init__(self, name=None, media_id=None):
         self.name = name
         self.params = {'media_id': media_id}
 
@@ -63,7 +63,7 @@ class scancode_pushMenu(Menu):
 
     type = 'scancode_push'
     
-    def __init__(self, name, key):
+    def __init__(self, name=None, key=None):
         self.name = name
         self.params = {'key': key}
 
@@ -72,61 +72,63 @@ class scancode_waitmsgMenu(Menu):
 
     type = 'scancode_waitmsg'
     
-    def __init__(self, name, url):
+    def __init__(self, name=None, key=None):
         self.name = name
-        self.params = {'url': url}
+        self.params = {'key': key}
 
 
 class pic_sysphotoMenu(Menu):
 
     type = 'pic_sysphoto'
     
-    def __init__(self, name, url):
+    def __init__(self, name=None, key=None):
         self.name = name
-        self.params = {'url': url}
+        self.params = {'key': key}
 
 
 class pic_photo_or_albumMenu(Menu):
 
     type = 'pic_photo_or_album'
     
-    def __init__(self, name, url):
+    def __init__(self, name=None, key=None):
         self.name = name
-        self.params = {'url': url}
+        self.params = {'key': key}
 
 
 class pic_weixinMenu(Menu):
 
     type = 'pic_weixin'
     
-    def __init__(self, name, url):
+    def __init__(self, name=None, key=None):
         self.name = name
-        self.params = {'url': url}
+        self.params = {'key': key}
 
 
 class location_selectMenu(Menu):
 
     type = 'location_select'
     
-    def __init__(self, name, url):
+    def __init__(self, name=None, key=None):
         self.name = name
-        self.params = {'url': url}
+        self.params = {'key': key}
 
 
 class view_limitedMenu(Menu):
 
     type = 'view_limited'
     
-    def __init__(self, name, url):
+    def __init__(self, name=None, media_id=None):
         self.name = name
-        self.params = {'url': url}
+        self.params = {'media_id': media_id}
 
 
 # menu container
 class MenuGroup(object):
 
-    def __init__(self, name, *args, **kwargs):
-        self.name = name
+    def __init__(self, *args, **kwargs):
+        if len(args) > 5:
+            raise Exception("二级菜单最多不能超过5个，现有%s个二级菜单" % len(args))
+        self.name = kwargs.pop("name")
         self.menu_list = args
         self.no_sub = kwargs.get("no_sub", True)
     
@@ -140,6 +142,8 @@ class MenuGroups(object):
 
     menu = None
     def __init__(self, *group_list):
+        if len(group_list) > 3:
+            raise Exception("一级菜单不能超过三个，现有%s个一级菜单" % len(group_list))
         self.menu = {"button": [group.menu() for group in group_list]}
 
 
@@ -147,13 +151,13 @@ class MenuGroups(object):
 """
 from flask_wechat.menu import ClickMenu, ViewMenu, MenuGroup, MenuGroups
 
-click1 = ClickMenu("你好", "1111")
-click2 = ClickMenu("wwo", '2222')
-view1 = ViewMenu('1111', 'http://www.hrjia.com')
-view2 = ViewMenu('2222', 'http://www.baidu.com')
+click1 = ClickMenu(name="你好", key="1111")
+click2 = ClickMenu(name="wwo", key='2222')
+view1 = ViewMenu(name='1111', url='http://www.hrjia.com')
+view2 = ViewMenu(name='2222', url='http://www.baidu.com')
 
-group1 = MenuGroup('菜单1', click1, view1)
-group2 = MenuGroup('菜单2', view2, click1)
+group1 = MenuGroup(click1, view1, name='菜单1')
+group2 = MenuGroup(view2, click1, name='菜单2')
 
 menu = MenuGroups(group1, group2).menu
 
