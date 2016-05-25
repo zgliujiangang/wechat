@@ -51,22 +51,22 @@ class ReplyTemplate(object):
 
     TEXT = """
             <xml>
-                <ToUserName><![CDATA[toUser]]></ToUserName>
-                <FromUserName><![CDATA[fromUser]]></FromUserName>
-                <CreateTime>12345678</CreateTime>
+                <ToUserName><![CDATA[%s]]></ToUserName>
+                <FromUserName><![CDATA[%s]]></FromUserName>
+                <CreateTime>%s</CreateTime>
                 <MsgType><![CDATA[text]]></MsgType>
-                <Content><![CDATA[你好]]></Content>
+                <Content><![CDATA[%s]]></Content>
             </xml>
             """
 
     IMAGE = """
             <xml>
-                <ToUserName><![CDATA[toUser]]></ToUserName>
-                <FromUserName><![CDATA[fromUser]]></FromUserName>
-                <CreateTime>12345678</CreateTime>
+                <ToUserName><![CDATA[%s]]></ToUserName>
+                <FromUserName><![CDATA[%s]]></FromUserName>
+                <CreateTime>%s</CreateTime>
                 <MsgType><![CDATA[image]]></MsgType>
                 <Image>
-                <MediaId><![CDATA[media_id]]></MediaId>
+                <MediaId><![CDATA[%s]]></MediaId>
                 </Image>
             </xml>
             """

@@ -6,17 +6,15 @@ class WechatError(Exception):
 
 
 class ErrorHandler(object):
+    
     err_dict = {}
 
     @classmethod
-    def dispatch_error(cls, errcode, debug=False):
+    def dispatch_error(cls, errcode):
         error = cls.err_dict.get(str(errcode))
-        if not debug:
-            print errcode, error
+        if not error:
+            raise ValueError('can not find this errcode: %s' % errcode)
         else:
-            if not error:
-                raise ValueError('can not find this errcode: %s' % errcode)
-            else:
-                raise WechatError(error)
+            raise WechatError(error)
 
 

@@ -12,8 +12,8 @@ class WechatConf(object):
     def __getattr__(self, attr_name):
         attr =  object.__getattr__(self, attr_name, None)
         if attr is None:
-            raise AttributeError("please set this attribute before use it:%s" % attr_name)
+            raise AttributeError("wechatconf please set this attribute before use it:%s" % attr_name)
         return attr
 
 
-default_conf = test_conf = WechatConf(appid='11111', appsecret='222222', token="11111")
+default_conf = test_conf = WechatConf(appid='88888888', appsecret='88888888', token="88888888")

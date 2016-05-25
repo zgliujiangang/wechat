@@ -1,6 +1,4 @@
 # coding: utf-8
-
-import requests
 import json
 from .utils import with_metaclass
 """
@@ -183,9 +181,7 @@ menu1 = MenuGroups(group1, group2)
 menu2 = MenuGroups(click1, group2)
 
 print menu1.menu
-menu1.create(access_token)
-
-print menu
+print menu2.menu
 """
 
     
