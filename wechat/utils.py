@@ -1,6 +1,7 @@
 # coding: utf-8
 import hashlib
 import re
+import urllib
 
 def sign(params, key):
     """
@@ -76,3 +77,7 @@ def with_metaclass(meta, *bases):
             return meta(clsname, bases, d)
 
     return type.__new__(metaclass, "templory_class", (), {})
+
+
+def wechat_dumps(data):
+    pass

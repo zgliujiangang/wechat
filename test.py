@@ -1,6 +1,7 @@
 # coding: utf-8
 import sys
 import json
+import urllib
 sys.path.append(".")
 
 from wechat.wechat import Wechat
@@ -14,7 +15,8 @@ wechat = Wechat(conf=conf)
 
 print wechat.access_token
 print default_menu.menu
-print wechat.post(ApiUrl.create_menu, data=json.dumps(default_menu.menu))
+#print wechat.post(ApiUrl.create_menu, data=json.dumps(default_menu.menu))
+test = {"x": '你是不是傻'}
 # 编码有问题待解决
 
 
