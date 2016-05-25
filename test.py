@@ -9,7 +9,7 @@ from wechat.wechat import Wechat
 from wechat.conf import WechatConf
 from wechat.urls import ApiUrl
 from wechat.msg import Reply, ReplyTemplate
-from wechat.menu import default_menu
+from wechat.menu import test_menu
 
 conf = WechatConf(appid="wxa8e2f9be2c6f347c", appsecret="0ed8890e310546b8ef45e1db174b2145", token="hrjiaweixin123")
 wechat = Wechat(conf=conf, debug=True)
@@ -22,6 +22,7 @@ wechat = Wechat(conf=conf, debug=True)
 
 
 #自动回复消息
+#TODO 消息加解密AES_KEY的实现
 reply = Reply(wechat=wechat)
 #如果是非事件消息，第二个值传空字符串
 @reply.route(("text", ""))
@@ -37,7 +38,7 @@ def click(params):
 
 @reply.route(("event", "subscribe"))
 def subscribe(params):
-	content = "你好，正在测试wechat sdk 关注事件推送接口！"
+	content = "你好，正在测试 wechat sdk 关注事件推送接口！"
 	return ReplyTemplate.TEXT % (params.get("FromUserName"), params.get("ToUserName"), \
 		datetime.datetime.now().strftime("%Y%m%d%H%S"), content)
 # Flask示例
@@ -55,7 +56,7 @@ def subscribe(params):
 #print wechat.access_token
 #print default_menu.menu
 #print wechat.post(ApiUrl.create_menu, data=json.dumps(default_menu.menu))
-# 编码有问题待解决
+# json.dumps时用unicode编码，传输给微信服务器会出现中文乱码的情况！编码问题待解决
 test = {"x": '你是不是傻'}
 
 

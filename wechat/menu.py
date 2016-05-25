@@ -26,7 +26,7 @@ class MenuMeta(type):
 class MenuBase(object):
 
     def menu(self):
-        menu_dict = {"type": self.type, "name": self.name}
+        menu_dict = {"type": self.type.lower(), "name": self.name}
         menu_dict.update(self.params)
         return menu_dict
 
@@ -153,8 +153,6 @@ class MenuGroups(object):
         self.menu = {"button": [group.menu() for group in group_list]}
         self.group_list = group_list
 
-    
-
 click1 = ClickMenu(name="点击1", key="1111")
 click2 = ClickMenu(name="点击2", key='2222')
 view1 = ViewMenu(name='链接1', url='http://www.hrjia.com')
@@ -163,11 +161,11 @@ media1 = MediaMenu(name='图片1', media_id='111111111111111')
 
 group1 = MenuGroup(click1, view1, name='菜单1')
 group2 = MenuGroup(view2, click2, media1, name='菜单2')
-default_menu = test_menu = MenuGroups(click1, view1)
+
+test_menu = MenuGroups(group1, group2)
+
 
 """
-from wechat.menu import ClickMenu, ViewMenu, MenuGroup, MenuGroups
-
 click1 = ClickMenu(name="点击1", key="1111")
 click2 = ClickMenu(name="点击2", key='2222')
 view1 = ViewMenu(name='链接1', url='http://www.hrjia.com')
@@ -176,9 +174,8 @@ media1 = MediaMenu(name='图片1', media_id='111111111111111')
 
 group1 = MenuGroup(click1, view1, name='菜单1')
 group2 = MenuGroup(view2, click2, media1, name='菜单2')
-default_menu = test_menu = MenuGroups(group1, group2)
 
-menu = default_menu.menu
+test_menu = MenuGroups(group1, group2)
 """
 
     

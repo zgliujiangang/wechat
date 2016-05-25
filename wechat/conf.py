@@ -15,4 +15,4 @@ class WechatConf(object):
         return attr
 
 
-default_conf = test_conf = WechatConf(appid='88888888', appsecret='88888888', token="88888888")
+default_conf = test_conf = WechatConf(appid='wechatsdk', appsecret='wechatsdk', token="wechatsdk")

@@ -89,8 +89,7 @@ class Wechat(object):
                             token=self._conf.token, access_token=self.access_token)
 
     def upload(self, url, **file_form):
-        # eg: file_form = {"media": open(filepath, 'rb'), 'title': 'test'}
-        # eg: result = wechat.upload("https://api.weixin.qq.com/cgi-bin/material/add_material?access_token={access_token}", media=open(file_path, 'rb'), title='test')
+        #result = wechat.upload("https://api.weixin.qq.com/cgi-bin/material/add_material?access_token={access_token}", media=open(file_path, 'rb'), title='test')
         register_openers()
         url = self.url_format(url)
         datagen, headers = multipart_encode(file_form)
