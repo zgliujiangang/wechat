@@ -52,17 +52,6 @@ class Reply(dict):
             return self.auth(data, self.wechat._conf.token)
 
 
-default_reply = test_reply = Reply()
-
-@default_reply.route(("text", ""))
-def text(params):
-    return "TEXT"
-
-@default_reply.route(("event", "click"))
-def click(params):
-    return "CLICK"
-
-
 class ReplyTemplate(object):
 
     TEXT = """
@@ -149,7 +138,3 @@ class ReplyTemplate(object):
                 </Articles>
             </xml> 
             """
-
-
-class SendMsg(object):
-    pass

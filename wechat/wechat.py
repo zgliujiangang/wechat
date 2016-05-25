@@ -1,5 +1,4 @@
 # coding: utf-8
-import hashlib
 import requests
 import json
 import urllib2
@@ -7,7 +6,6 @@ import memcache
 from poster.encode import multipart_encode
 from poster.streaminghttp import register_openers
 from .conf import WechatConf, default_conf
-from .msg import default_reply
 from .urls import ApiUrl
 from .error import ErrorHandler
 
@@ -18,6 +16,7 @@ class Wechat(object):
         assert isinstance(conf, WechatConf), "conf object must be a WechatConf instance!"
         self._conf = conf
         self.err_handler = err_handler
+        self.debug = debug
 
     def get_access_token(self):
         access_token = self.get_cache_access_token()
@@ -64,7 +63,10 @@ class Wechat(object):
     del get_access_token
 
     def dispatch_error(self, errcode):
-        self.err_handler.dispatch_error(errcode)
+        if not self.debug:
+            print errcode
+        else:
+            self.err_handler.dispatch_error(errcode)
 
     def get(self, url, params=None):
         url = self.url_format(url)
@@ -77,7 +79,6 @@ class Wechat(object):
     def post(self, url, data=None, _json=None):
         url = self.url_format(url)
         resp = requests.post(url, data=data, json=_json)
-        print resp.text
         result = json.loads(resp.text)
         if "errcode" in result:
             self.dispatch_error(result.get("errcode"))
