@@ -34,7 +34,7 @@ class Wechat(object):
         if access_token and expires_in:
             self.cache_access_token(access_token, expires_in)
             return access_token
-        self.dispatch_error(result.get("errcode"))
+        self.err_handler.dispatch_error(result.get("errcode"))
 
     def cache_access_token(self, access_token, expires_in):
         """
@@ -68,6 +68,10 @@ class Wechat(object):
         else:
             self.err_handler.dispatch_error(errcode)
 
+    def url_format(self, url):
+        return url.format(appid=self._conf.appid, appsecret=self._conf.appsecret, 
+                            token=self._conf.token, access_token=self.access_token)
+
     def get(self, url, params=None):
         url = self.url_format(url)
         resp = requests.get(url, params)
@@ -84,10 +88,6 @@ class Wechat(object):
             self.dispatch_error(result.get("errcode"))
         return result
 
-    def url_format(self, url):
-        return url.format(appid=self._conf.appid, appsecret=self._conf.appsecret, 
-                            token=self._conf.token, access_token=self.access_token)
-
     def upload(self, url, **file_form):
         #result = wechat.upload("https://api.weixin.qq.com/cgi-bin/material/add_material?access_token={access_token}", media=open(file_path, 'rb'), title='test')
         register_openers()
@@ -98,6 +98,18 @@ class Wechat(object):
         if "errcode" in result:
             self.dispatch_error(result.get("errcode"))
         return result
+
+    def jsconf(self, url):
+        # return {"appId": appID, "timestamp": timestamp, "nonceStr": nonceStr, "signature": signature}
+        pass
+
+    def __enter__(self):
+        self.real_debug = self.debug
+        self.debug = True
+
+    def __exit__(self):
+        self.debug = self.real_debug
+        del self.real_debug
 
     def __getattr__(self, attr_name):
         attr = object.__getattr__(self, attr_name, None)

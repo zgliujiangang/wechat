@@ -18,6 +18,9 @@ wechat = Wechat(conf=conf, debug=True)
 #wechat.get(ApiUrl.url, params=params)
 #wechat.post(ApiUrl.url, data=data, _json=_json)
 #wechat.upload(ApiUrl.url, **file_form)
+#如果你想调用接口出错时抛出异常，可以像下面如此调用，在with语句内debug是True的
+#with wechat:
+#	result = wehchat.get(url, params)
 #**********调用微信接口**********
 
 
