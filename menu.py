@@ -155,33 +155,30 @@ class MenuGroups(object):
 
     
 
-click1 = ClickMenu(name="你好", key="1111")
-click2 = ClickMenu(name="wwo", key='2222')
-view1 = ViewMenu(name='1111', url='http://www.hrjia.com')
-view2 = ViewMenu(name='2222', url='http://www.baidu.com')
-media = MediaMenu(name='xxs', media_id='111111111111111')
+click1 = ClickMenu(name="点击1", key="1111")
+click2 = ClickMenu(name="点击2", key='2222')
+view1 = ViewMenu(name='链接1', url='http://www.hrjia.com')
+view2 = ViewMenu(name='链接2', url='http://www.baidu.com')
+media1 = MediaMenu(name='图片1', media_id='111111111111111')
 
-group1 = MenuGroup(click1, name='菜单1')
-group2 = MenuGroup(view2, click1, name='菜单2')
-default_menu = test_menu = MenuGroups(group1, group2)
+group1 = MenuGroup(click1, view1, name='菜单1')
+group2 = MenuGroup(view2, click2, media1, name='菜单2')
+default_menu = test_menu = MenuGroups(click1, view1)
 
 """
 from wechat.menu import ClickMenu, ViewMenu, MenuGroup, MenuGroups
 
-click1 = ClickMenu(name="你好", key="1111")
-click2 = ClickMenu(name="wwo", key='2222')
-view1 = ViewMenu(name='1111', url='http://www.hrjia.com')
-view2 = ViewMenu(name='2222', url='http://www.baidu.com')
-media = MediaMenu(name='xxs', media_id='111111111111111')
+click1 = ClickMenu(name="点击1", key="1111")
+click2 = ClickMenu(name="点击2", key='2222')
+view1 = ViewMenu(name='链接1', url='http://www.hrjia.com')
+view2 = ViewMenu(name='链接2', url='http://www.baidu.com')
+media1 = MediaMenu(name='图片1', media_id='111111111111111')
 
-group1 = MenuGroup(click1, name='菜单1')
-group2 = MenuGroup(view2, click1, name='菜单2')
+group1 = MenuGroup(click1, view1, name='菜单1')
+group2 = MenuGroup(view2, click2, media1, name='菜单2')
+default_menu = test_menu = MenuGroups(group1, group2)
 
-menu1 = MenuGroups(group1, group2)
-menu2 = MenuGroups(click1, group2)
-
-print menu1.menu
-print menu2.menu
+menu = default_menu.menu
 """
 
     

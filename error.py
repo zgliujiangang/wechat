@@ -7,7 +7,7 @@ class WechatError(Exception):
 
 class ErrorHandler(object):
     
-    err_dict = {}
+    err_dict = {"40016": "不合法的按钮个数"}
 
     @classmethod
     def dispatch_error(cls, errcode):

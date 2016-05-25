@@ -88,9 +88,10 @@ class Wechat(object):
             self.dispatch_error(result.get("errcode"))
         return result
 
-    def post(self, url, data=None, json=None):
+    def post(self, url, data=None, _json=None):
         url = self.url_format(url)
-        resp = requests.post(url, data=data, json=json)
+        resp = requests.post(url, data=data, json=_json)
+        print resp.text
         result = json.loads(resp.text)
         if "errcode" in result:
             self.dispatch_error(result.get("errcode"))
