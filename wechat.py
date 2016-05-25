@@ -3,9 +3,7 @@ import hashlib
 import requests
 import json
 import urllib2
-# 先用memorycached缓存access_token
-import memorycached
-# 先用memorycached缓存access_token
+import memcache
 from poster.encode import multipart_encode
 from poster.streaminghttp import register_openers
 from .conf import WechatConf, default_conf
@@ -26,36 +24,43 @@ class Wechat(object):
     def get_access_token(self):
         access_token = self.get_cache_access_token()
         if not access_token:
+            print "i am init access_token"
             access_token = self.init_access_token()
         return access_token
 
     def init_access_token(self):
         # 每日有调用次数上限，需要缓存结果
-        return None
-        result = self.get(ApiUrl.token)
+        resp = requests.get(ApiUrl.token.format(appid=self._conf.appid, appsecret=self._conf.appsecret))
+        result = json.loads(resp.text)
         access_token = result.get("access_token")
         expires_in = result.get("expires_in")
         if access_token and expires_in:
             self.cache_access_token(access_token, expires_in)
             return access_token
-        else:
-            raise ValueError("can not get access_token: %s" % str(result))
+        self.dispatch_error(result.get("errcode"))
 
     def cache_access_token(self, access_token, expires_in):
-        # 缓存access_token 需要自定义
-        # eg:redis.set(access_token_key, access_token, expires=expires_in)
+        """
+        缓存access_token
+        redis eg: 
+        redis_for_token.set(access_token_key, access_token, expires_in)
+        """
         access_token_key = self._conf.appid
-        pass
+        mc = memcache.Client(['127.0.0.1:11211'], debug=0)
+        mc.set(access_token_key, access_token, int(expires_in)-30)
 
     def get_cache_access_token(self):
-        # 获取缓存的access_token 需要自定义
-        # eg:access_token = redis.get(access_token_key)
-        # eg:if not access_token:
-        # eg:   return None
-        # eg:return access_token
-        access_token = "1111111111"
-        #return access_token
-        return None
+        """
+        获取缓存的access_token
+        redis eg:
+        access_token = redis_for_token.get(access_token_key)
+        if not access_token:
+            return None
+        return access_token
+        """
+        access_token_key = self._conf.appid
+        mc = memcache.Client(['127.0.0.1:11211'], debug=0)
+        return mc.get(access_token_key)
 
     access_token = property(get_access_token)
     del get_access_token
@@ -72,8 +77,8 @@ class Wechat(object):
             # 服务器接入验证 仅支持data以字典形式传入
             return self._reply.auth(data, self._conf.token)
 
-    def dispatch_error(self, err_code):
-        self.err_handler.dispatch_error(err_code)
+    def dispatch_error(self, errcode):
+        self.err_handler.dispatch_error(errcode)
 
     def get(self, url, params=None):
         url = self.url_format(url)

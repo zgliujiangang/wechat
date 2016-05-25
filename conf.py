@@ -3,11 +3,10 @@
 
 class WechatConf(object):
 
-    def __init__(self, appid=None, appsecret=None, token=None, paysignkey=None):
+    def __init__(self, appid=None, appsecret=None, token=None):
         self.appid = appid
         self.appsecret = appsecret
         self.token = token
-        self.paysignkey = paysignkey
 
     def __getattr__(self, attr_name):
         attr =  object.__getattr__(self, attr_name, None)
