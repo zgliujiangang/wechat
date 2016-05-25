@@ -1,7 +1,11 @@
 # coding: utf-8
 import hashlib
+from .utils import xml_to_dict
 
 class Reply(dict):
+
+    def __init__(self, wechat=None):
+        self.wechat = wechat
 
     def route(self, msg_type):
         # msg_type是一个二元元祖,如("event", "click")
@@ -34,6 +38,18 @@ class Reply(dict):
             return data.get("echostr")
         else:
             return "FAIL"
+
+    def __call__(self, data, auth=False):
+        if not auth:
+            # 消息对话 data仅支持xml字符串或者字典
+            params = data
+            if isinstance(data, str):
+                params = xml_to_dict(data)
+            response = self.response((params.get("MsgType"), params.get("Event", "")), params)
+            return response
+        else:
+            # 服务器接入验证 仅支持data以字典形式传入
+            return self.auth(data, self.wechat._conf.token)
 
 
 default_reply = test_reply = Reply()

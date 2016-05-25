@@ -8,17 +8,15 @@ from poster.encode import multipart_encode
 from poster.streaminghttp import register_openers
 from .conf import WechatConf, default_conf
 from .msg import default_reply
-from .utils import xml_to_dict
 from .urls import ApiUrl
 from .error import ErrorHandler
 
 
 class Wechat(object):
 
-    def __init__(self, conf=default_conf, reply=default_reply, err_handler=ErrorHandler, debug=False):
+    def __init__(self, conf=default_conf, err_handler=ErrorHandler, debug=False):
         assert isinstance(conf, WechatConf), "conf object must be a WechatConf instance!"
         self._conf = conf
-        self._reply = reply
         self.err_handler = err_handler
 
     def get_access_token(self):
@@ -64,18 +62,6 @@ class Wechat(object):
 
     access_token = property(get_access_token)
     del get_access_token
-
-    def reply(self, data, auth=False):
-        if not auth:
-            # 消息对话 data仅支持xml字符串或者字典
-            params = data
-            if isinstance(data, str):
-                params = xml_to_dict(data)
-            response = self._reply.response((params.get("MsgType"), params.get("Event", "")), params)
-            return response
-        else:
-            # 服务器接入验证 仅支持data以字典形式传入
-            return self._reply.auth(data, self._conf.token)
 
     def dispatch_error(self, errcode):
         self.err_handler.dispatch_error(errcode)
