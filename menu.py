@@ -155,18 +155,17 @@ class MenuGroups(object):
         self.menu = {"button": [group.menu() for group in group_list]}
         self.group_list = group_list
 
-    def create(self, access_token):
-        return MenuOperate.create(access_token, self.menu)
-
-    def search(self, access_token):
-        return MenuOperate.search(access_token)
-
-    def delete(cls, access_token):
-        return MenuOperate.delete(access_token)
-
     
 
+click1 = ClickMenu(name="你好", key="1111")
+click2 = ClickMenu(name="wwo", key='2222')
+view1 = ViewMenu(name='1111', url='http://www.hrjia.com')
+view2 = ViewMenu(name='2222', url='http://www.baidu.com')
+media = MediaMenu(name='xxs', media_id='111111111111111')
 
+group1 = MenuGroup(click1, name='菜单1')
+group2 = MenuGroup(view2, click1, name='菜单2')
+default_menu = test_menu = MenuGroups(group1, group2)
 
 """
 from wechat.menu import ClickMenu, ViewMenu, MenuGroup, MenuGroups
@@ -188,26 +187,5 @@ menu1.create(access_token)
 
 print menu
 """
-
-class MenuOperate(object):
-
-    @classmethod
-    def create(cls, access_token, menu_dict):
-        url = "https://api.weixin.qq.com/cgi-bin/menu/create?access_token=%s" % access_token
-        # TODO 菜单中含有中文字符串时菜单不会正确显示
-        resp = requests.post(url, json=json.dumps(menu_dict))
-        return json.loads(resp.text)
-
-    @classmethod
-    def search(cls, access_token):
-        url = "https://api.weixin.qq.com/cgi-bin/menu/get?access_token=%s" % access_token
-        resp = requests.get(url)
-        return json.loads(resp.text)
-
-    @classmethod
-    def delete(cls, access_token):
-        url = "https://api.weixin.qq.com/cgi-bin/menu/delete?access_token=%s" % access_token
-        resp = requests.get(url)
-        return json.loads(resp.text)
 
     

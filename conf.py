@@ -2,12 +2,8 @@
 
 
 class WechatConf(object):
-    appid = None
-    appsecret = None
-    token = None
-    paysignkey = None
 
-    def __init__(self, appid, appsecret, token=None, paysignkey=None):
+    def __init__(self, appid=None, appsecret=None, token=None, paysignkey=None):
         self.appid = appid
         self.appsecret = appsecret
         self.token = token
@@ -20,4 +16,4 @@ class WechatConf(object):
         return attr
 
 
-default_conf = test_conf = WechatConf('11111', '222222')
+default_conf = test_conf = WechatConf(appid='11111', appsecret='222222', token="11111")
