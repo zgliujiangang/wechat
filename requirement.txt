@@ -1,0 +1,3 @@
+
+memcache #缓存access_token时用到
+poster #文件上传时用到
