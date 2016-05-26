@@ -21,7 +21,7 @@ class Wechat(object):
     def get_access_token(self):
         access_token = self.get_cache_access_token()
         if not access_token:
-            print "i am init access_token"
+            print "here init access_token"
             access_token = self.init_access_token()
         return access_token
 
