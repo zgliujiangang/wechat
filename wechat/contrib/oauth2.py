@@ -22,9 +22,7 @@ class Oauth2(object):
 
     def code_ex_token(self, code):
         url = ApiUrl.oauth2_token % code
-        # debug here
-        with self.wechat:
-            return self.wechat.get(url)
+        return self.wechat.get(url)
         
     def token_ex_info(self, access_token, openid):
         url = ApiUrl.oauth2_userinfo % (access_token, openid)
@@ -32,7 +30,9 @@ class Oauth2(object):
 
     def refresh_token(self, retoken):
         url = ApiUrl.oauth2_refresh % retoken
-        return self.wechat.get(url)
+        # debug here
+        with self.wechat:
+            return self.wechat.get(url)
 
     def check_token(self, access_token, openid):
         url = ApiUrl.oauth2_check % (access_token, openid)

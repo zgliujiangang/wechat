@@ -16,6 +16,7 @@ class ApiUrl(object):
     oauth2_token = "https://api.weixin.qq.com/sns/oauth2/access_token?appid={appid}&secret={appsecret}&code=%s&grant_type=authorization_code"
     oauth2_userinfo = "https://api.weixin.qq.com/sns/userinfo?access_token=%s&openid=%s&lang=zh_CN"
     oauth2_refresh = "https://api.weixin.qq.com/sns/oauth2/refresh_token?appid={appid}&grant_type=refresh_token&refresh_token=%s"
+    oauth2_check = "https://api.weixin.qq.com/sns/auth?access_token=%s&openid=%s"
 
     # 素材管理模块
     # 临时素材
