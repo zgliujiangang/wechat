@@ -1,4 +1,5 @@
 # coding: utf-8
+# 素材管理
 from ..urls import ApiUrl
 
 class MediaType(object):

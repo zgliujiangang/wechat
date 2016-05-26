@@ -1,4 +1,5 @@
 # coding: utf-8
+# 自定义菜单
 import json
 from ..utils import with_metaclass
 """

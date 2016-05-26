@@ -11,7 +11,7 @@ from wechat.urls import ApiUrl
 from wechat.contrib.msg import Reply, ReplyTemplate
 from wechat.contrib.oauth2 import Oauth2
 from wechat.contrib.menu import test_menu
-from wechat.contrib.media import TemporaryMedia
+from wechat.contrib.media import TemporaryMedia, PermanentMedia
 
 conf = WechatConf(appid="wxa8e2f9be2c6f347c", appsecret="0ed8890e310546b8ef45e1db174b2145", token="hrjiaweixin123")
 wechat = Wechat(conf=conf)
@@ -86,6 +86,8 @@ wechat = Wechat(conf=conf)
 #     copy_file = open("copy.png", 'wb')
 #     copy_file.write(my_image["result"])
 #     copy_file.close()
+#my_media = PermanentMedia(wechat)
+#print my_media.get_list()
 # 素材管理接口测试
 
 

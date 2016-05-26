@@ -1,4 +1,5 @@
 # coding: utf-8
+# oauth2.0认证
 from urllib import quote
 from ..wechat import Wechat
 from ..urls import ApiUrl

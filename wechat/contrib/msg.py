@@ -1,4 +1,5 @@
 # coding: utf-8
+# 接收消息和被动回复消息
 import hashlib
 from ..utils import xml_to_dict
 
