@@ -1,6 +1,6 @@
 # coding: utf-8
 import json
-from .utils import with_metaclass
+from ..utils import with_metaclass
 """
 请注意，3到8的所有事件，仅支持微信iPhone5.4.1以上版本，\
 和Android5.4以上版本的微信用户，旧版本微信用户点击后将没有回应，\

@@ -1,6 +1,6 @@
 # coding: utf-8
 import hashlib
-from .utils import xml_to_dict
+from ..utils import xml_to_dict
 
 class Reply(dict):
 

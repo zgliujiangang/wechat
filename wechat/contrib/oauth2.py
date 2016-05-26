@@ -1,7 +1,7 @@
 # coding: utf-8
 from urllib import quote
-from .wechat import Wechat
-from .urls import ApiUrl
+from ..wechat import Wechat
+from ..urls import ApiUrl
 
 
 #网页授权必须配置授权回调域名

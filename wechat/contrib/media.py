@@ -1,5 +1,5 @@
 # coding: utf-8
-from .urls import ApiUrl
+from ..urls import ApiUrl
 
 class MediaType(object):
     image = "image"
