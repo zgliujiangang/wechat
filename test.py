@@ -8,11 +8,11 @@ sys.path.append(".")
 from wechat.wechat import Wechat
 from wechat.conf import WechatConf
 from wechat.urls import ApiUrl
-from wechat.msg import Reply, ReplyTemplate
-from wechat.menu import test_menu
+#from wechat.msg import Reply, ReplyTemplate
+from wechat.oauth2 import Oauth2
 
 conf = WechatConf(appid="wxa8e2f9be2c6f347c", appsecret="0ed8890e310546b8ef45e1db174b2145", token="hrjiaweixin123")
-wechat = Wechat(conf=conf, debug=True)
+wechat = Wechat(conf=conf)
 #access_token = wechat.access_token
 #**********调用微信接口**********
 #wechat.get(ApiUrl.url, params=params)
@@ -24,7 +24,7 @@ wechat = Wechat(conf=conf, debug=True)
 #**********调用微信接口**********
 
 
-#自动回复消息
+#自动回复消息测试
 #TODO 消息加解密AES_KEY的实现
 # reply = Reply(wechat=wechat)
 # #如果是非事件消息，第二个值传空字符串
@@ -55,11 +55,22 @@ wechat = Wechat(conf=conf, debug=True)
 
 
 
+# 测试自定义菜单
+# from wechat.menu import test_menu
+# print wechat.access_token
+# print test_menu.menu
+# print wechat.post(ApiUrl.create_menu, data=test_menu.menu)
+# 测试自定义菜单
 
-print wechat.access_token
-print test_menu.menu
-print wechat.post(ApiUrl.create_menu, data=test_menu.menu)
-test = {"x": '你是不是傻'}
+
+# 测试oauth接口
+# oauth2 = Oauth2(wechat)
+#print oauth2.code_ex_token("11111111111111")
+#print oauth2.token_ex_info("11111", "22222")
+#print oauth2.auth_url("www.baidu.com?*&&=111")
+#print oauth2.check_token("111111", "1111111")
+#print oauth2.refresh_token("111111")
+# 测试oauth接口
 
 
 

@@ -4,7 +4,7 @@ from .utils import xml_to_dict
 
 class Reply(dict):
 
-    def __init__(self, wechat=None):
+    def __init__(self, wechat):
         self.wechat = wechat
 
     def route(self, msg_type):
@@ -49,7 +49,7 @@ class Reply(dict):
             return response
         else:
             # 服务器接入验证 仅支持data以字典形式传入
-            return self.auth(data, self.wechat._conf.token)
+            return self.auth(data, self.wechat.conf.token)
 
 
 class ReplyTemplate(object):

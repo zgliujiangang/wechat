@@ -4,27 +4,47 @@ from .wechat import Wechat
 from .urls import ApiUrl
 
 
+#网页授权必须配置授权回调域名
+#网页授权的access_token与获取基础信息的access_token不是同一个东西
+
+class Scope(object):
+    base = "snsapi_base"
+    userinfo = "snsapi_userinfo"
+
+
 class Oauth2(object):
 
-    base = "https://open.weixin.qq.com/connect/oauth2/authorize?appid=%s&redirect_uri=%s&response_type=code&scope=snsapi_base&state=STATE#wechat_redirect"
-    info = "https://open.weixin.qq.com/connect/oauth2/authorize?appid=%s&redirect_uri=%s&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect"
+    url = "https://open.weixin.qq.com/connect/oauth2/authorize?appid=%s&redirect_uri=%s&response_type=code&scope=%s&state=%s#wechat_redirect"
+
     def __init__(self, wechat):
         assert isinstance(wechat, Wechat), "wechat must be a Wechat instance"
         self.wechat = wechat
 
-    def access_token_openid(self, code):
+    def code_ex_token(self, code):
         url = ApiUrl.oauth2_token % code
-        result = self.wechat.get(url)
-        _access_token, openid = result.get("access_token"), result.get("openid")
-        return _access_token, openid
+        # debug here
+        with self.wechat:
+            return self.wechat.get(url)
+        
+    def token_ex_info(self, access_token, openid):
+        url = ApiUrl.oauth2_userinfo % (access_token, openid)
+        return self.wechat.get(url)
 
-    def userinfo(self, access_token, openid):
-        url = ApiUrl.userinfo % (access_token, openid)
-        result = self.wechat.get(url)
-        return result
+    def refresh_token(self, retoken):
+        url = ApiUrl.oauth2_refresh % retoken
+        return self.wechat.get(url)
 
-    def base_url(self, url):
-        return self.base % (self.wechat.conf.appid, quote(url))
+    def check_token(self, access_token, openid):
+        url = ApiUrl.oauth2_check % (access_token, openid)
+        return self.wechat.get(url)
 
-    def info_url(self, url):
-        return self.info % (self.wechat.conf.appid, quote(url))
+    def auth_url(self, url, scope=Scope.base, state="STATE", url_encode=True):
+        if url_encode:
+            url = quote(url)
+        url = self.url % (self.wechat.conf.appid, url, scope, state)
+        return url
+
+
+
+
+

@@ -14,7 +14,7 @@ class Wechat(object):
 
     def __init__(self, conf=default_conf, err_handler=ErrorHandler, debug=False):
         assert isinstance(conf, WechatConf), "conf object must be a WechatConf instance!"
-        self._conf = conf
+        self.conf = conf
         self.err_handler = err_handler
         self.debug = debug
 
@@ -27,7 +27,7 @@ class Wechat(object):
 
     def init_access_token(self):
         # 每日有调用次数上限，需要缓存结果
-        resp = requests.get(ApiUrl.token.format(appid=self._conf.appid, appsecret=self._conf.appsecret))
+        resp = requests.get(ApiUrl.token.format(appid=self.conf.appid, appsecret=self.conf.appsecret))
         result = json.loads(resp.text)
         access_token = result.get("access_token")
         expires_in = result.get("expires_in")
@@ -42,7 +42,7 @@ class Wechat(object):
         redis eg: 
         redis_for_token.set(access_token_key, access_token, expires_in)
         """
-        access_token_key = self._conf.appid
+        access_token_key = self.conf.appid
         mc = memcache.Client(['127.0.0.1:11211'], debug=0)
         mc.set(access_token_key, access_token, int(expires_in)-30)
 
@@ -55,7 +55,7 @@ class Wechat(object):
             return None
         return access_token
         """
-        access_token_key = self._conf.appid
+        access_token_key = self.conf.appid
         mc = memcache.Client(['127.0.0.1:11211'], debug=0)
         return mc.get(access_token_key)
 
@@ -69,8 +69,8 @@ class Wechat(object):
             self.err_handler.dispatch_error(errcode)
 
     def url_format(self, url):
-        return url.format(appid=self._conf.appid, appsecret=self._conf.appsecret, 
-                            token=self._conf.token, access_token=self.access_token)
+        return url.format(appid=self.conf.appid, appsecret=self.conf.appsecret, 
+                            token=self.conf.token, access_token=self.access_token)
 
     def get(self, url, params=None):
         url = self.url_format(url)
@@ -112,7 +112,7 @@ class Wechat(object):
         self.real_debug = self.debug
         self.debug = True
 
-    def __exit__(self):
+    def __exit__(self, exc_type, exc_value, traceback):
         self.debug = self.real_debug
         del self.real_debug
 
