@@ -116,9 +116,3 @@ class Wechat(object):
         self.debug = self.real_debug
         del self.real_debug
 
-    def __getattr__(self, attr_name):
-        attr = object.__getattr__(self, attr_name, None)
-        if attr is None:
-            raise AttributeError("wechat please set this attribute before use it:%s" % attr_name)
-        return attr
-
