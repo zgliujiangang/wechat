@@ -8,8 +8,8 @@ sys.path.append(".")
 from wechat.wechat import Wechat
 from wechat.conf import WechatConf
 from wechat.urls import ApiUrl
-#from wechat.msg import Reply, ReplyTemplate
-from wechat.oauth2 import Oauth2
+from wechat.contrib.msg import Reply, ReplyTemplate
+from wechat.contrib.oauth2 import Oauth2
 
 conf = WechatConf(appid="wxa8e2f9be2c6f347c", appsecret="0ed8890e310546b8ef45e1db174b2145", token="hrjiaweixin123")
 wechat = Wechat(conf=conf)
