@@ -82,6 +82,7 @@ class Wechat(object):
         return result
 
     def post(self, url, data=None):
+        # 参数data直接传字典进来，不要json编码，我后面会编码的
         url = self.url_format(url)
         # 传含有中文字符的json串时需要进行ensure_ascii处理
         data = json.dumps(data, ensure_ascii=False)
@@ -103,6 +104,22 @@ class Wechat(object):
         if errcode and str(errcode) != "0":
             self.dispatch_error(errcode)
         return result
+
+    def download(self, url, data=None):
+        url = self.url_format(url)
+        resp = urllib2.urlopen(url, data=data).read()
+        try:
+            result = json.loads(resp)
+            print result
+            errcode = result.get("errcode")
+            if errcode and str(errcode) != "0":
+                self.dispatch_error(errcode)
+            # 有的素材会返回media_id所以能被json解析不代表未返回素材
+            return {"type": "json", "result": result}
+        except Exception as e:
+            print "maybe download file successfully"
+            # resp可以用StringIO.StringIO(resp)处理
+            return {"type": "buffer", "result": resp}
 
     def jsconf(self, url):
         # return {"appId": appID, "timestamp": timestamp, "nonceStr": nonceStr, "signature": signature}
