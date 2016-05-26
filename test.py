@@ -11,6 +11,7 @@ from wechat.urls import ApiUrl
 from wechat.contrib.msg import Reply, ReplyTemplate
 from wechat.contrib.oauth2 import Oauth2
 from wechat.contrib.menu import test_menu
+from wechat.contrib.media import TemporaryMedia
 
 conf = WechatConf(appid="wxa8e2f9be2c6f347c", appsecret="0ed8890e310546b8ef45e1db174b2145", token="hrjiaweixin123")
 wechat = Wechat(conf=conf)
@@ -71,6 +72,21 @@ wechat = Wechat(conf=conf)
 # print oauth2.check_token("111111", "1111111")
 # print oauth2.refresh_token("111111")
 # 测试oauth接口
+
+
+# 素材管理接口测试
+# img_name = "test.png"
+# my_media = TemporaryMedia(wechat)
+#print my_media.upload(media=open(img_name, 'rb'))下面是返回的结果
+# media_id = "8xjbXRO40_jgSeGtGRqi-qbjuSbztp4FhblA6cfJJQELqlJQjKbS45dcoe5_0MtA"
+# my_image = my_media.download(media_id)
+# if my_image["type"] == "json":
+#     print my_image
+# if my_image["type"] == "buffer":
+#     copy_file = open("copy.png", 'wb')
+#     copy_file.write(my_image["result"])
+#     copy_file.close()
+# 素材管理接口测试
 
 
 

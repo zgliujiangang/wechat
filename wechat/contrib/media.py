@@ -22,7 +22,7 @@ class MediaBaseManager(object):
         # TODO 增加对路径的支持，目前请不要传路径
         # TODO 上传视频素材时还要增加一个表单
         url = self.upload_url % type
-        return self.wechat.upload(self.upload_url, media=media)
+        return self.wechat.upload(url, media=media)
 
     def download(self, media_id):
         # 未下载成功会返回None,需要debug时wechat=Wechat(debug=True)
