@@ -76,16 +76,20 @@ class Wechat(object):
         url = self.url_format(url)
         resp = requests.get(url, params)
         result = json.loads(resp.text)
-        if "errcode" in result:
-            self.dispatch_error(result.get("errcode"))
+        errcode = result.get("errcode")
+        if errcode and str(errcode) != "0":
+            self.dispatch_error(errcode)
         return result
 
-    def post(self, url, data=None, _json=None):
+    def post(self, url, data=None):
         url = self.url_format(url)
-        resp = requests.post(url, data=data, json=_json)
+        # 传含有中文字符的json串时需要进行ensure_ascii处理
+        data = json.dumps(data, ensure_ascii=False)
+        resp = requests.post(url, data=data)
         result = json.loads(resp.text)
-        if "errcode" in result:
-            self.dispatch_error(result.get("errcode"))
+        errcode = result.get("errcode")
+        if errcode and str(errcode) != "0":
+            self.dispatch_error(errcode)
         return result
 
     def upload(self, url, **file_form):
@@ -95,8 +99,9 @@ class Wechat(object):
         datagen, headers = multipart_encode(file_form)
         request = urllib2.Request(url, datagen, headers)
         result = json.loads(urllib2.urlopen(request).read())
-        if "errcode" in result:
-            self.dispatch_error(result.get("errcode"))
+        errcode = result.get("errcode")
+        if errcode and str(errcode) != "0":
+            self.dispatch_error(errcode)
         return result
 
     def jsconf(self, url):

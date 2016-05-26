@@ -26,24 +26,24 @@ wechat = Wechat(conf=conf, debug=True)
 
 #自动回复消息
 #TODO 消息加解密AES_KEY的实现
-reply = Reply(wechat=wechat)
-#如果是非事件消息，第二个值传空字符串
-@reply.route(("text", ""))
-def text(params):
-	return ReplyTemplate.TEXT % (params.get("FromUserName"), params.get("ToUserName"), \
-		datetime.datetime.now().strftime("%Y%m%d%H%S"), params.get("Content"))
+# reply = Reply(wechat=wechat)
+# #如果是非事件消息，第二个值传空字符串
+# @reply.route(("text", ""))
+# def text(params):
+# 	return ReplyTemplate.TEXT % (params.get("FromUserName"), params.get("ToUserName"), \
+# 		datetime.datetime.now().strftime("%Y%m%d%H%S"), params.get("Content"))
 
-#如果是事件消息，传两个参数
-@reply.route(("event", "click"))
-def click(params):
-	return ReplyTemplate.TEXT % (params.get("FromUserName"), params.get("ToUserName"), \
-		datetime.datetime.now().strftime("%Y%m%d%H%S"), params.get("EventKey"))
+# #如果是事件消息，传两个参数
+# @reply.route(("event", "click"))
+# def click(params):
+# 	return ReplyTemplate.TEXT % (params.get("FromUserName"), params.get("ToUserName"), \
+# 		datetime.datetime.now().strftime("%Y%m%d%H%S"), params.get("EventKey"))
 
-@reply.route(("event", "subscribe"))
-def subscribe(params):
-	content = "你好，正在测试 wechat sdk 关注事件推送接口！"
-	return ReplyTemplate.TEXT % (params.get("FromUserName"), params.get("ToUserName"), \
-		datetime.datetime.now().strftime("%Y%m%d%H%S"), content)
+# @reply.route(("event", "subscribe"))
+# def subscribe(params):
+# 	content = "你好，正在测试 wechat sdk 关注事件推送接口！"
+# 	return ReplyTemplate.TEXT % (params.get("FromUserName"), params.get("ToUserName"), \
+# 		datetime.datetime.now().strftime("%Y%m%d%H%S"), content)
 # Flask示例
 #from flask import request
 #@app.route("/wechat/callback/")
@@ -56,10 +56,9 @@ def subscribe(params):
 
 
 
-#print wechat.access_token
-#print default_menu.menu
-#print wechat.post(ApiUrl.create_menu, data=json.dumps(default_menu.menu))
-# json.dumps时用unicode编码，传输给微信服务器会出现中文乱码的情况！编码问题待解决
+print wechat.access_token
+print test_menu.menu
+print wechat.post(ApiUrl.create_menu, data=test_menu.menu)
 test = {"x": '你是不是傻'}
 
 

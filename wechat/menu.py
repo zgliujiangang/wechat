@@ -160,7 +160,7 @@ view2 = ViewMenu(name='链接2', url='http://www.baidu.com')
 media1 = MediaMenu(name='图片1', media_id='111111111111111')
 
 group1 = MenuGroup(click1, view1, name='菜单1')
-group2 = MenuGroup(view2, click2, media1, name='菜单2')
+group2 = MenuGroup(view2, click2, name='菜单2')
 
 test_menu = MenuGroups(group1, group2)
 
@@ -173,7 +173,7 @@ view2 = ViewMenu(name='链接2', url='http://www.baidu.com')
 media1 = MediaMenu(name='图片1', media_id='111111111111111')
 
 group1 = MenuGroup(click1, view1, name='菜单1')
-group2 = MenuGroup(view2, click2, media1, name='菜单2')
+group2 = MenuGroup(view2, click2, name='菜单2')
 
 test_menu = MenuGroups(group1, group2)
 """
