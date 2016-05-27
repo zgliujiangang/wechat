@@ -32,3 +32,30 @@ class ApiUrl(object):
     update_news = "https://api.weixin.qq.com/cgi-bin/material/update_news?access_token={access_token}"
     _media_count = "https://api.weixin.qq.com/cgi-bin/material/get_materialcount?access_token={access_token}"
     _media_list = "https://api.weixin.qq.com/cgi-bin/material/batchget_material?access_token={access_token}"
+
+    #消息管理模块
+    add_staff = "https://api.weixin.qq.com/customservice/kfaccount/add?access_token={access_token}"
+    update_staff = "https://api.weixin.qq.com/customservice/kfaccount/update?access_token={access_token}"
+    delete_staff = "https://api.weixin.qq.com/customservice/kfaccount/del?access_token={access_token}"
+    set_headimg = "http://api.weixin.qq.com/customservice/kfaccount/uploadheadimg?access_token={access_token}&kf_account=%s"
+    get_kflist = "https://api.weixin.qq.com/cgi-bin/customservice/getkflist?access_token={access_token}"
+    send_msg = "https://api.weixin.qq.com/cgi-bin/message/custom/send?access_token={access_token}"
+
+    #用户管理模块
+    create_group = "https://api.weixin.qq.com/cgi-bin/groups/create?access_token={access_token}"
+    get_groups = "https://api.weixin.qq.com/cgi-bin/groups/get?access_token={access_token}"
+    get_id = "https://api.weixin.qq.com/cgi-bin/groups/getid?access_token={access_token}"
+    update_group = "https://api.weixin.qq.com/cgi-bin/groups/update?access_token={access_token}"
+    to_group = "https://api.weixin.qq.com/cgi-bin/groups/members/update?access_token={access_token}"
+    batch_to_group = "https://api.weixin.qq.com/cgi-bin/groups/members/batchupdate?access_token={access_token}"
+    delete_group = "https://api.weixin.qq.com/cgi-bin/groups/delete?access_token={access_token}"
+    update_remark = "https://api.weixin.qq.com/cgi-bin/user/info/updateremark?access_token={access_token}"
+    get_userinfo = "https://api.weixin.qq.com/cgi-bin/user/info?access_token={access_token}&openid=%s&lang=zh_CN"
+    batch_get_userinfo = "https://api.weixin.qq.com/cgi-bin/user/info/batchget?access_token={access_token}"
+    get_userlist = "https://api.weixin.qq.com/cgi-bin/user/get?access_token={access_token}&next_openid=%s"
+
+
+    #帐号管理
+    create_qrcode = "https://api.weixin.qq.com/cgi-bin/qrcode/create?access_token={access_token}"
+    download_qrcode = "https://mp.weixin.qq.com/cgi-bin/showqrcode?ticket=%s"
+    get_shorturl = "https://api.weixin.qq.com/cgi-bin/shorturl?access_token={access_token}"

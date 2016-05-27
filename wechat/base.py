@@ -98,7 +98,7 @@ class Wechat(object):
         return result
 
     def post(self, url, data=None):
-        # 参数data直接传字典进来，不要json编码，我后面会编码的
+        # data为字典，后面会json转换的
         url = self.url_format(url)
         # 传含有中文字符的json串时需要进行ensure_ascii处理
         data = json.dumps(data, ensure_ascii=False)
@@ -110,7 +110,7 @@ class Wechat(object):
         return result
 
     def upload(self, url, **file_form):
-        #result = wechat.upload("https://api.weixin.qq.com/cgi-bin/material/add_material?access_token={access_token}", media=open(file_path, 'rb'), title='test')
+        # 文件上传，如果有open操作，请在with上下文环境中执行
         register_openers()
         url = self.url_format(url)
         datagen, headers = multipart_encode(file_form)
@@ -122,6 +122,7 @@ class Wechat(object):
         return result
 
     def download(self, url, data=None):
+        # 文件下载，返回buffer, 也有可能返回json串
         url = self.url_format(url)
         resp = urllib2.urlopen(url, data=data).read()
         try:
@@ -138,6 +139,7 @@ class Wechat(object):
             return {"type": "buffer", "result": resp}
 
     def jsconf(self, url):
+        # web网页进行js conf注入时所需参数
         noncestr = random_str()
         timestamp = int(time.time())
         params = dict(noncestr=noncestr, url=url, timestamp=timestamp, jsapi_ticket=self.jsapi_ticket)
@@ -148,10 +150,13 @@ class Wechat(object):
         return dict(appId=self.conf.appid, timestamp=timestamp, nonceStr=noncestr, signature=signature)
 
     def __enter__(self):
+        # with self:开启debug模式，接口调用未成功会抛出异常
         self.real_debug = self.debug
         self.debug = True
 
     def __exit__(self, exc_type, exc_value, traceback):
+        # debug恢复原有状态
         self.debug = self.real_debug
-        del self.real_debug
+        del self.real_debug 
+
 

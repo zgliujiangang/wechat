@@ -4,6 +4,7 @@ import hashlib
 from ..utils import xml_to_dict
 
 class Reply(dict):
+    #回复微信消息的类
 
     def __init__(self, wechat, default="success"):
         self.wechat = wechat
@@ -19,6 +20,7 @@ class Reply(dict):
         self[msg_type] = func
 
     def response(self, msg_type, *args, **kwargs):
+        # 回复微信消息
         try:
             msg_type = self.convert(msg_type)
             return self[msg_type](*args, **kwargs)
@@ -31,6 +33,7 @@ class Reply(dict):
         return msg_type
 
     def auth(self, data, token):
+        # 服务器接入验证
         params = [data.get("timestamp"), data.get("nonce"), token]
         params.sort()
         params_string = "".join(params)

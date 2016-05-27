@@ -2,13 +2,6 @@
 # 自定义菜单
 import json
 from ..utils import with_metaclass
-"""
-请注意，3到8的所有事件，仅支持微信iPhone5.4.1以上版本，\
-和Android5.4以上版本的微信用户，旧版本微信用户点击后将没有回应，\
-开发者也不能正常接收到事件推送。9和10，是专门给第三方平台旗下未微信认证\
-（具体而言，是资质认证未通过）的订阅号准备的事件类型，它们是没有事件推送的，\
-能力相对受限，其他类型的公众号不必使用。
-"""
 
 type_set = frozenset(['click', 'view', 'scancode_push', 'scancode_waitmsg', 'pic_sysphoto', \
     'pic_photo_or_album', 'pic_weixin', 'location_select', 'media_id', 'view_limited'])
@@ -153,17 +146,6 @@ class MenuGroups(object):
             raise Exception("一级菜单不能超过三个，现有%s个一级菜单" % len(group_list))
         self.menu = {"button": [group.menu() for group in group_list]}
         self.group_list = group_list
-
-click1 = ClickMenu(name="点击1", key="1111")
-click2 = ClickMenu(name="点击2", key='2222')
-view1 = ViewMenu(name='链接1', url='http://www.hrjia.com')
-view2 = ViewMenu(name='链接2', url='http://www.baidu.com')
-media1 = MediaMenu(name='图片1', media_id='111111111111111')
-
-group1 = MenuGroup(click1, view1, name='菜单1')
-group2 = MenuGroup(view2, click2, name='菜单2')
-
-test_menu = MenuGroups(group1, group2)
 
 
 """
