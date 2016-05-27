@@ -2,6 +2,7 @@
 # 自定义菜单
 import json
 from ..utils import with_metaclass
+from ..urls import ApiUrl
 
 type_set = frozenset(['click', 'view', 'scancode_push', 'scancode_waitmsg', 'pic_sysphoto', \
     'pic_photo_or_album', 'pic_weixin', 'location_select', 'media_id', 'view_limited'])
@@ -147,18 +148,20 @@ class MenuGroups(object):
         self.menu = {"button": [group.menu() for group in group_list]}
         self.group_list = group_list
 
+class MenuManager(object):
 
-"""
-click1 = ClickMenu(name="点击1", key="1111")
-click2 = ClickMenu(name="点击2", key='2222')
-view1 = ViewMenu(name='链接1', url='http://www.hrjia.com')
-view2 = ViewMenu(name='链接2', url='http://www.baidu.com')
-media1 = MediaMenu(name='图片1', media_id='111111111111111')
+    def __init__(self, wechat):
+        self.wechat = wechat
 
-group1 = MenuGroup(click1, view1, name='菜单1')
-group2 = MenuGroup(view2, click2, name='菜单2')
+    def create_menu(self, data):
+        if isinstance(data, MenuGroups):
+            data = data.menu
+        return self.wechat.post(ApiUrl.create_menu, data=data)
 
-test_menu = MenuGroups(group1, group2)
-"""
+    def get_menu(self):
+        return self.wechat.get(ApiUrl.get_menu)
+
+    def delete_menu(self):
+        return self.wechat.get(ApiUrl.delete_menu)
 
     
