@@ -5,7 +5,7 @@ import urllib
 import datetime
 sys.path.append(".")
 
-from wechat.wechat import Wechat
+from wechat import Wechat
 from wechat.conf import WechatConf
 from wechat.urls import ApiUrl
 from wechat.contrib.msg import Reply, ReplyTemplate
@@ -15,7 +15,10 @@ from wechat.contrib.media import TemporaryMedia, PermanentMedia
 
 conf = WechatConf(appid="wxa8e2f9be2c6f347c", appsecret="0ed8890e310546b8ef45e1db174b2145", token="hrjiaweixin123")
 wechat = Wechat(conf=conf)
-#access_token = wechat.access_token
+access_token = wechat.access_token
+jsapi_ticket = wechat.jsapi_ticket
+print access_token
+print jsapi_ticket
 #**********调用微信接口**********
 #wechat.get(ApiUrl.url, params=params)
 #wechat.post(ApiUrl.url, data=data)

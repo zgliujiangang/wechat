@@ -24,19 +24,16 @@ class Wechat(object):
         """
         缓存access_token
         redis eg: 
-        redis_for_token.set(access_token_key, access_token, expires_in)
+        redis.set(key, value, expires_in)
         """
         mc = memcache.Client(['127.0.0.1:11211'], debug=0)
-        mc.set(key, access_token, int(expires_in)-30)
+        mc.set(key, value, int(expires_in)-30)
 
     def get_cache_data(self, key):
         """
         获取缓存的access_token
         redis eg:
-        access_token = redis_for_token.get(access_token_key)
-        if not access_token:
-            return None
-        return access_token
+        return redis.get(key)
         """
         mc = memcache.Client(['127.0.0.1:11211'], debug=0)
         return mc.get(key)
