@@ -161,6 +161,7 @@ class ErrorHandler(object):
         if not error:
             raise ValueError('can not find this errcode: %s' % errcode)
         else:
+            error = "%s:%s" % (errcode, error)
             raise WechatError(error)
 
 
