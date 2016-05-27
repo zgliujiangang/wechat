@@ -6,6 +6,7 @@ class ApiUrl(object):
     wechat_ip = "https://api.weixin.qq.com/cgi-bin/getcallbackip?access_token={access_token}"
     # access_token获取接口
     token = "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid={appid}&secret={appsecret}"
+    jsapi_ticket = "https://api.weixin.qq.com/cgi-bin/ticket/getticket?access_token={access_token}&type=jsapi"
 
     # 微信公众号菜单自定义接口
     create_menu = "https://api.weixin.qq.com/cgi-bin/menu/create?access_token={access_token}"

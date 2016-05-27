@@ -70,6 +70,7 @@ def make_order_number():
     serial = ''.join(random.sample(''.join([string.ascii_letters, string.digits]), 6))
     return '%s%s' % (now, serial)
 
+
 def with_metaclass(meta, *bases):
     
     class metaclass(type):
@@ -77,7 +78,3 @@ def with_metaclass(meta, *bases):
             return meta(clsname, bases, d)
 
     return type.__new__(metaclass, "templory_class", (), {})
-
-
-def wechat_dumps(data):
-    pass

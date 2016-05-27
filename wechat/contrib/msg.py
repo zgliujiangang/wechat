@@ -5,7 +5,7 @@ from ..utils import xml_to_dict
 
 class Reply(dict):
 
-    def __init__(self, wechat):
+    def __init__(self, wechat, default="success"):
         self.wechat = wechat
 
     def route(self, msg_type):
@@ -24,7 +24,7 @@ class Reply(dict):
             return self[msg_type](*args, **kwargs)
         except Exception as e:
             print e
-            return None
+            return self.default
 
     def convert(self, msg_type):
         msg_type = tuple([item.lower() for item in msg_type])
