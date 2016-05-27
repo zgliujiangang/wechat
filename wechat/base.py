@@ -22,7 +22,6 @@ class Wechat(object):
 
     def cache_data(self, key, value, expires_in):
         """
-        缓存access_token
         redis eg: 
         redis.set(key, value, expires_in)
         """
@@ -31,7 +30,6 @@ class Wechat(object):
 
     def get_cache_data(self, key):
         """
-        获取缓存的access_token
         redis eg:
         return redis.get(key)
         """
