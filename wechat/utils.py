@@ -2,6 +2,7 @@
 import hashlib
 import re
 import urllib
+import string
 
 def sign(params, key):
     """
