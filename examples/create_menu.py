@@ -14,7 +14,8 @@ def test():
 	click2 = ClickMenu(name="点击2", key='2222')
 	view1 = ViewMenu(name='链接1', url='http://www.hrjia.com')
 	view2 = ViewMenu(name='链接2', url='http://www.baidu.com')
-	media1 = MediaMenu(name='测试图片', media_id='8xjbXRO40_jgSeGtGRqi-qbjuSbztp4FhblA6cfJJQELqlJQjKbS45dcoe5_0MtA')
+	# media_id为上传永久素材获取到的media_id
+	media1 = MediaMenu(name='测试图片', media_id='OVygHfzd3teiBAykiejczQLDG198q6mjeB_ZkNVfyVM')
 
 	group1 = MenuGroup(click1, view1, name='菜单1')
 	group2 = MenuGroup(view2, click2, name='菜单2')

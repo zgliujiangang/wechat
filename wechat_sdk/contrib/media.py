@@ -1,5 +1,6 @@
 # coding: utf-8
 # 素材管理
+import json
 from ..urls import ApiUrl
 
 class MediaType(object):
@@ -42,6 +43,10 @@ class PermanentMedia(MediaBaseManager):
 
     upload_url = ApiUrl._media_upload
     download_url = ApiUrl._media_download
+
+    def download(self, media_id):
+        url = self.download_url
+        return self.wechat.download(url, data=dict(media_id=media_id))
 
     def add_news(self, data):
         return self.wechat.post(ApiUrl.add_news, data=data)

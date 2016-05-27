@@ -124,7 +124,7 @@ class Wechat(object):
     def download(self, url, data=None):
         # 文件下载，返回buffer, 也有可能返回json串
         url = self.url_format(url)
-        resp = urllib2.urlopen(url, data=data).read()
+        resp = urllib2.urlopen(url, data=json.dumps(data)).read()
         try:
             result = json.loads(resp)
             print result

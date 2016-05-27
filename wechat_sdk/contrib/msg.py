@@ -8,6 +8,7 @@ class Reply(dict):
 
     def __init__(self, wechat, default="success"):
         self.wechat = wechat
+        self.default = default
 
     def route(self, msg_type):
         # msg_type是一个二元元祖,如("event", "click")
