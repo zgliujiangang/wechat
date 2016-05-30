@@ -4,6 +4,7 @@ import json
 import urllib2
 import memcache
 import time
+import hashlib
 from poster.encode import multipart_encode
 from poster.streaminghttp import register_openers
 from .conf import WechatConf, default_conf

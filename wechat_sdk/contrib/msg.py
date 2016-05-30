@@ -35,13 +35,18 @@ class Reply(dict):
 
     def auth(self, data, token):
         # 服务器接入验证
-        params = [data.get("timestamp"), data.get("nonce"), token]
-        params.sort()
-        params_string = "".join(params)
-        signature = hashlib.sha1(params_string).hexdigest()
-        if signature == data.get("signature"):
-            return data.get("echostr")
-        else:
+        try:
+            params = [data.get("timestamp"), data.get("nonce"), token]
+            params.sort()
+            params_string = "".join(params)
+            signature = hashlib.sha1(params_string).hexdigest()
+            if signature == data.get("signature"):
+                return data.get("echostr")
+            else:
+                print "服务器接入验证时签名不匹配"
+                return "FAIL"
+        except Exception as e:
+            print e
             return "FAIL"
 
     def __call__(self, data, auth=False):
