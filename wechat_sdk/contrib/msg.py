@@ -1,14 +1,21 @@
 # coding: utf-8
 # 接收消息和被动回复消息
 import hashlib
-from ..utils import xml_to_dict
+from ..utils import xml_to_dict, random_str
+from ..WXBizMsgCrypt import WXBizMsgCrypt
 
-class Reply(dict):
+
+class Reply(object):
     #回复微信消息的类
 
-    def __init__(self, wechat, default="success"):
+    def __init__(self, wechat, default="success", mode=False):
+        # mode 加密模式->False:明文；True:密文
         self.wechat = wechat
         self.default = default
+        self.mode = mode
+        self.register_funcs = dict()
+        if mode:
+            self.msgcrypt = WXBizMsgCrypt(wechat.conf.token, wechat.conf.aeskey, wechat.conf.appid)
 
     def route(self, msg_type):
         # msg_type是一个二元元祖,如("event", "click")
@@ -18,13 +25,13 @@ class Reply(dict):
 
     def register(self, msg_type, func):
         msg_type = self.convert(msg_type)
-        self[msg_type] = func
+        self.register_funcs[msg_type] = func
 
     def response(self, msg_type, *args, **kwargs):
         # 回复微信消息
         try:
             msg_type = self.convert(msg_type)
-            return self[msg_type](*args, **kwargs)
+            return self.register_funcs[msg_type](*args, **kwargs) or self.default
         except Exception as e:
             print e
             return self.default
@@ -49,17 +56,37 @@ class Reply(dict):
             print e
             return "FAIL"
 
-    def __call__(self, data, auth=False):
+    def clear(self, xml):
+        # 明文模式
+        params = xml_to_dict(xml)
+        response = self.response((params.get("MsgType"), params.get("Event", "")), params)
+        return response
+
+    def cipher(self, xml, args):
+        # 密文模式
+        de_ret, xml = self.msgcrypt.DecryptMsg(xml, args.get("msg_signature"), 
+            args.get("timestamp"), args.get("nonce"))
+        response = self.clear(xml)
+        if response != self.default:
+            # 回复的消息不是默认消息时才进行加密
+            nonce = random_str(min_length=10, max_length=10)
+            en_ret, response = self.msgcrypt.EncryptMsg(response, nonce)
+        else:
+            pass
+        return response
+
+    def __call__(self, data=None, args=None, auth=False):
+        #param data:post消息体中的字符串
+        #param args:url上携带的参数字典
         if not auth:
-            # 消息对话 data仅支持xml字符串或者字典
-            params = data
-            if isinstance(data, str):
-                params = xml_to_dict(data)
-            response = self.response((params.get("MsgType"), params.get("Event", "")), params)
+            if self.mode:
+                response = self.cipher(data, args)
+            else:
+                response = self.clear(data)
             return response
         else:
             # 服务器接入验证 仅支持data以字典形式传入
-            return self.auth(data, self.wechat.conf.token)
+            return self.auth(args, self.wechat.conf.token)
 
 
 class ReplyTemplate(object):
