@@ -6,9 +6,10 @@ sys.path.append("..")
 from examples.init_wechat import wechat
 from wechat_sdk.contrib.msg import Reply, ReplyTemplate
 #自动回复消息测试
-#TODO 消息加解密AES_KEY的实现
 reply = Reply(wechat, default="yes i am just a test")
-#如果是非事件消息，第二个值传空字符串
+#设置密文模式：将mode设置为True
+#reply = Reply(wechat, default="yes i am just a test", mode=True)
+#如果是非事件消息，第二个值传空字符串，大小写无关
 @reply.route(("text", ""))
 def text(params):
 	return ReplyTemplate.TEXT % (params.get("FromUserName"), params.get("ToUserName"), \
