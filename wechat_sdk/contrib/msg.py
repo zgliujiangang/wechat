@@ -21,6 +21,7 @@ class Reply(object):
         # msg_type是一个二元元祖,如("event", "click")
         def wrap(func):
             self.register(msg_type, func)
+            return func
         return wrap
 
     def register(self, msg_type, func):
