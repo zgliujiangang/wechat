@@ -6,28 +6,31 @@ from ._analyse import analyse
 class SqlUtil(object):
     """
     目前不能进行联表查询
+    SELECT FOUND_ROWS();
     """
 
     __table__ = None
-    sql = None
-    params = list()
-    #count_sql = "SELECT FOUND_ROWS()"
 
     def __init__(self, table):
         # 初始化表名及数据
-        self.sql = None
-        self.params = []
         self.__table__ = table
-
-        self._filter = None
         self._select = []
-        self._page = None
+        self._join = []
+        self._filters = []
+        self._params = []
+        self._page = []
         self._order = []
+        self._count = False
 
     def clear(self):
         # 清除数据
-        self.sql = None
-        self.params = []
+        self._select = []
+        self._join = []
+        self._filters = []
+        self._params = []
+        self._page = []
+        self._order = []
+        self._count = False
         return self
 
     def table(self, table_name):
@@ -44,14 +47,28 @@ class SqlUtil(object):
         self._select = self._select.extend(fields)
         return self
 
+    def filter(self, **kwargs):
+        filters, params = self.analyse(**kwargs)
+        self._filters.extend(filters)
+        self._params.extend(params)
+        return self
+
     def page(self, offset, limit):
         #获取分页数据
-        self.sql = "{sql} LIMIT %s, %s".format(self.sql)
-        self.params.extend([offset, limit])
+        self._page = [offset, limit]
         return self
 
     def order_by(self, *args):
-        self.sql = "%s ORDER BY %s" % (self.sql, ", ".join(args))
+        self._order = args
+        return self
+
+    def join(self, table, fields, condition, **kwargs):
+        table = self.__class__(table).get(fields).filter(**kwargs)
+        self._join.append((table, condition))
+        return self
+
+    def count(self):
+        self._count = True
         return self
 
     def insert(self, **kwargs):
@@ -66,24 +83,35 @@ class SqlUtil(object):
         self.sql, self.params = sql, values
         return self
 
-    def filter(self, **kwargs):
-        conditions, params = self.__class__.analyse(**kwargs)
-        return (conditions, params)
-
-    def join(self):
-        pass
-
-    @classmethod
-    def analyse(cls, **kwargs):
+    def analyse(self, **kwargs):
         #@param kwargs:pk=1,name__like=Lucy
         #解析查询参数
-        _analyse = [analyse.analyse(cls.__table__, key, value) for key, value in kwargs.items()]
-        conditions = [item[0] for item in _analyse]
+        _analyse = [analyse.analyse(self.__table__, key, value) for key, value in kwargs.items()]
+        filters = [item[0] for item in _analyse]
         params = [item[1] for item in _analyse]
-        return conditions, params
+        return filters, params
 
     @property
     def data(self):
-        pass
+        select_sql = "SELECT %s FROM %s" if not self._count else "SELECT SQL_CALC_FOUND_ROWS %s FROM %s"
+        join_sql = ""
+        clause_sql = ""
+        limit_sql = ""
+        order_sql = ""
+        for table, condition in self._join:
+            join_sql = "%s LEFT JOIN %s ON %s" % (join_sql, table.__table__, condition)
+            self._select.extend(table._select)
+            self._filters.extend(table._filters)
+            self._params.extend(table._params)
+        if self._filters:
+            clause_sql = "WHERE %s" % " AND ".join(self._filters)
+        if self._page:
+            limit_sql = "LIMIT %s, %s" % self._page
+        if self._order:
+            order_sql = "ORDER BY %s" % ", ".join(self._order)
+        select_sql = select_sql % (" ".join(self._select), self.__table__)
+        sql = " ".join[select_sql, join_sql, clause_sql, limit_sql, order_sql]
+        params = self._params
+        return (sql, params)
     
     
