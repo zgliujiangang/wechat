@@ -3,7 +3,7 @@
 from ._analyse import analyse
 
 
-class SqlUtil(object):
+class SqlFormat(object):
     """
     目前不能进行联表查询
     SELECT FOUND_ROWS();
@@ -74,14 +74,21 @@ class SqlUtil(object):
     def insert(self, **kwargs):
         #@param kwargs:name='Lucy',age=20,sex=0...
         #在数据库中插入一条数据
-        params = kwargs.items()
-        columns = [item[0] for item in params]
-        values = [item[1] for item in params]
-        _columns = ["{column}=%s".foramt(column=column) for column in columns]
-        _columns = ", ".join(_columns)
-        sql = "INSERT INTO {table} SET {columns}".format(table=self.__table__, columns=_columns)
-        self.sql, self.params = sql, values
-        return self
+        columns, params = self.write(**kwargs)
+        sql = "INSERT INTO {table} SET {columns}".format(table=self.__table__, columns=columns)
+        return (sql, params)
+
+    def update(self, values, filters):
+        up_sql = "UPDATE %s SET %s"
+        columns, params = self.write(**values)
+        up_sql = up_sql % (self.__table__, columns)
+        clause_sql = ""
+        if filters:
+            _filters, _params = self.analyse(**filters)
+            clause_sql = "WHERE %s" % " AND ".join(filters)
+            params.extend(_params)
+        sql = "%s %s" % (up_sql, clause_sql)
+        return (sql, params)
 
     def analyse(self, **kwargs):
         #@param kwargs:pk=1,name__like=Lucy
@@ -90,6 +97,14 @@ class SqlUtil(object):
         filters = [item[0] for item in _analyse]
         params = [item[1] for item in _analyse]
         return filters, params
+
+    def write(self, **kwargs):
+        kwargs = kwargs.items()
+        params = [item[1] for item in kwargs]
+        columns = [item[0] for item in kwargs]
+        columns = ["{column}=%s".foramt(column=column) for column in columns]
+        columns = ", ".join(_columns)
+        return columns, params
 
     @property
     def data(self):
