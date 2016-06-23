@@ -1,7 +1,7 @@
 # coding: utf-8
 
-from ._analyse import analyse
 
+from ._analyse import analyse
 
 
 class SqlBase(object):
@@ -32,8 +32,11 @@ class SqlBase(object):
         #@param kwargs:pk=1,name__like=Lucy
         #解析查询参数
         _analyse = [analyse.analyse(self.__table__, key, value) for key, value in kwargs.items()]
-        filters = [item[0] for item in _analyse]
-        params = [item[1] for item in _analyse]
+        filters = list()
+        params = list()
+        for _filter, _param in _analyse:
+            filters.append(_filter)
+            params.extend(_param)
         return filters, params
 
     def _break(self, **kwargs):
@@ -57,8 +60,8 @@ class SqlSearch(SqlBase):
         self.__table__ = table
         self._select = list()
         self._join = list()
-        self._page = list()
         self._order = list()
+        self._page = list()
         self._count = False
 
     def clear(self):
@@ -66,8 +69,8 @@ class SqlSearch(SqlBase):
         super(SqlSearch, self).clear()
         self._select = list()
         self._join = list()
-        self._page = None
         self._order = list()
+        self._page = None
         self._count = False
         return self
 
@@ -125,14 +128,14 @@ class SqlSearch(SqlBase):
             filters_params.extend(table.filters_params)
         if filters:
             clause_sql = "WHERE %s" % " AND ".join(filters)
-        if self._page:
-            limit_sql = "LIMIT %s, %s" % self._page
         if self._order:
             order_sql = "ORDER BY %s" % ", ".join(self._order)
+        if self._page:
+            limit_sql = "LIMIT %s, %s" % self._page
         if not _select:
             raise ValueError('you should select at least one cloumn!')
         select_sql = select_sql % (", ".join(_select), self.__table__)
-        sql = " ".join([select_sql, join_sql, clause_sql, limit_sql, order_sql])
+        sql = " ".join([select_sql, join_sql, clause_sql, order_sql, limit_sql])
         return (sql, filters_params)
 
 
@@ -198,6 +201,22 @@ class SqlUpdate(SqlBase):
             clause_sql = "WHERE %s" % " AND ".join(self.filters)
         sql = "%s %s" % (columns_sql, clause_sql)
         params = self.columns_params + self.filters_params
+        return (sql, params)
+
+
+class SqlCount(SqlBase):
+
+    def __init__(self, table):
+        super(SqlCount, self).__init__()
+        self.__table__ = table
+
+    def data(self):
+        count_sql = "SELECT COUNT(*) as `count` FROM %s" % self.__table__
+        clause_sql = ""
+        if self.filters:
+            clause_sql = "WHERE %s" % " AND ".join(self.filters)
+        sql = "%s %s" % (count_sql, clause_sql)
+        params = self.filters_params
         return (sql, params)
     
     

@@ -27,45 +27,48 @@ class FieldBaseAnalyse(object):
                 raise KeyError("mode:%s funcs doesn't match!" % mode)
         else:
             field = key
-            return "{table}.{field} = %s".format(table=table, field=field), value
+            return "{table}.{field} = %s".format(table=table, field=field), [value]
 
 
 base_analyse = FieldBaseAnalyse()
 
 
-@base_analyse.add("in")
-def field_in(table, field, value):
-    if not isinstance(value, list):
-        value = [value]
-    return "{table}.{field} in %s".format(table=table, field=field), value
-
 @base_analyse.add("gt")
 def field_gt(table, field, value):
-    return "{table}.{field} > %s".format(table=table, field=field), value
+    return "{table}.{field} > %s".format(table=table, field=field), [value]
 
 @base_analyse.add("lt")
 def field_lt(table, field, value):
-    return "{table}.{field} < %s".format(table=table, field=field), value
+    return "{table}.{field} < %s".format(table=table, field=field), [value]
 
 @base_analyse.add("gte")
 def field_gte(table, field, value):
-    return "{table}.{field} >= %s".format(table=table, field=field), value
+    return "{table}.{field} >= %s".format(table=table, field=field), [value]
 
 @base_analyse.add("lte")
 def field_lte(table, field, value):
-    return "{table}.{field} <= %s".format(table=table, field=field), value
+    return "{table}.{field} <= %s".format(table=table, field=field), [value]
 
 @base_analyse.add("like")
 def field_like(table, field, value):
-    return "{table}.{field} LIKE %s".format(table=table, field=field), "%s%s%s" % ("%", value, "%")
+    return "{table}.{field} LIKE %s".format(table=table, field=field), ["%s%s%s" % ("%", value, "%")]
 
 @base_analyse.add("start_with")
 def field_like(table, field, value):
-    return "{table}.{field} LIKE %s".format(table=table, field=field), "%s%s" % (value, "%")
+    return "{table}.{field} LIKE %s".format(table=table, field=field), ["%s%s" % (value, "%")]
 
 @base_analyse.add("end_with")
 def field_like(table, field, value):
-    return "{table}.{field} LIKE %s".format(table=table, field=field), "%s%s" % ("%", value)
+    return "{table}.{field} LIKE %s".format(table=table, field=field), ["%s%s" % ("%", value)]
+
+@base_analyse.add("isnull")
+def field_isnull(table, field, value):
+    return "isnull({table}.{field}) = %s".format(table=table, field=field), [int(value)]
+
+@base_analyse.add("in")
+def field_in(table, field, value):
+    places = ", ".join(["%s" for x in range(len(value))])
+    return "{table}.{field} in (%s)".format(table=table, field=field) % places, value
 
 
 class FieldAnalyse(FieldBaseAnalyse):
