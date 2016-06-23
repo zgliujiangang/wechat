@@ -3,6 +3,7 @@
 from ._analyse import analyse
 
 
+
 class SqlBase(object):
 
     __table__ = None
@@ -35,12 +36,10 @@ class SqlBase(object):
         params = [item[1] for item in _analyse]
         return filters, params
 
-    def write(self, **kwargs):
+    def _break(self, **kwargs):
         #解析要插入的数据
         kwargs = kwargs.items()
-        columns = [item[0] for item in kwargs]
-        params = [item[1] for item in kwargs]
-        return columns, params
+        return [item[0] for item in kwargs], [item[1] for item in kwargs]
 
     def data(self):
         return None
@@ -67,7 +66,7 @@ class SqlSearch(SqlBase):
         super(SqlSearch, self).clear()
         self._select = list()
         self._join = list()
-        self._page = list()
+        self._page = None
         self._order = list()
         self._count = False
         return self
@@ -83,7 +82,7 @@ class SqlSearch(SqlBase):
 
     def page(self, offset=0, limit=20):
         #获取分页数据
-        self._page = [offset, limit]
+        self._page = (offset, limit)
         return self
 
     def order_by(self, *args):
@@ -98,14 +97,14 @@ class SqlSearch(SqlBase):
     def join_get(self, fields):
         if len(self._join) == 0:
             raise ValueError('join table must set before get!')
-        join = self._join[:-1]
+        join = self._join[-1]
         join[0].get(fields)
         return self
 
     def join_filter(self, **kwargs):
         if len(self._join) == 0:
             raise ValueError('join table must set before get!')
-        join = self._join[:-1]
+        join = self._join[-1]
         join[0].filter(**kwargs)
         return self
 
@@ -130,8 +129,10 @@ class SqlSearch(SqlBase):
             limit_sql = "LIMIT %s, %s" % self._page
         if self._order:
             order_sql = "ORDER BY %s" % ", ".join(self._order)
+        if not _select:
+            raise ValueError('you should select at least one cloumn!')
         select_sql = select_sql % (", ".join(_select), self.__table__)
-        sql = " ".join[select_sql, join_sql, clause_sql, limit_sql, order_sql]
+        sql = " ".join([select_sql, join_sql, clause_sql, limit_sql, order_sql])
         return (sql, filters_params)
 
 
@@ -153,14 +154,14 @@ class SqlInsert(SqlBase):
     def insert(self, **kwargs):
         #@param kwargs:name='Lucy',age=20,sex=0...
         #在数据库中插入一条数据
-        columns, params = self.write(**kwargs)
-        self.columns = columns
-        self.columns_params = params
+        self.columns, self.columns_params = self._break(**kwargs)
         return self
 
     def data(self):
-        columns = ["{column}=%s".foramt(column=column) for column in self.columns]
-        columns = ", ".join(_columns)
+        columns = ["{column}=%s".format(column=column) for column in self.columns]
+        if not columns:
+            raise ValueError("you should insert at least one column!")
+        columns = ", ".join(columns)
         sql = "INSERT INTO {table} SET {columns}".format(table=self.__table__, columns=columns)
         params = self.columns_params
         return (sql, params)
@@ -181,16 +182,16 @@ class SqlUpdate(SqlBase):
         self.columns_params = list()
         return self
 
-    def update(self, values, filters):
-        columns, params = self.write(**values)
-        self.columns = columns
-        self.columns_params = params
+    def update(self, **kwargs):
+        self.columns, self.columns_params = self._break(**kwargs)
         return self
 
     def data(self):
         columns_sql = "UPDATE %s SET %s"
-        columns = ["{column}=%s".foramt(column=column) for column in self.columns]
-        columns = ", ".join(_columns)
+        columns = ["{column}=%s".format(column=column) for column in self.columns]
+        if not columns:
+            raise ValueError("you should update at least one column!")
+        columns = ", ".join(columns)
         columns_sql = columns_sql % (self.__table__, columns)
         clause_sql = ""
         if self.filters:

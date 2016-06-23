@@ -18,16 +18,16 @@ class FieldBaseAnalyse(object):
     
     def analyse(self, table, key, value):
         #@param param:name='Lucy';name__like='Lucy';name__contains='Lucy'
-        match = pattern.match(key)
+        match = self.pattern.match(key)
         if match:
             field, mode = match.groups()
             if mode in self.mode_funcs:
                 return self.mode_funcs[mode](table, field, value)
             else:
-                raise KeyError("mode funcs doesn't match!")
+                raise KeyError("mode:%s funcs doesn't match!" % mode)
         else:
-            field = param
-            return "{table}.{field} = %s".format(table=table, field=field)
+            field = key
+            return "{table}.{field} = %s".format(table=table, field=field), value
 
 
 base_analyse = FieldBaseAnalyse()
@@ -59,11 +59,11 @@ def field_lte(table, field, value):
 def field_like(table, field, value):
     return "{table}.{field} LIKE %s".format(table=table, field=field), "%s%s%s" % ("%", value, "%")
 
-@base_analyse.add("start_with"):
+@base_analyse.add("start_with")
 def field_like(table, field, value):
     return "{table}.{field} LIKE %s".format(table=table, field=field), "%s%s" % (value, "%")
 
-@base_analyse.add("end_with"):
+@base_analyse.add("end_with")
 def field_like(table, field, value):
     return "{table}.{field} LIKE %s".format(table=table, field=field), "%s%s" % ("%", value)
 
