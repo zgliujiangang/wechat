@@ -1,6 +1,7 @@
 # coding: utf-8
 
 import logging
+import traceback
 
 
 logging.info("i am a test")
@@ -26,8 +27,8 @@ class MysqlContext(object):
 
 	def __exit__(self, exec_type, exec_value, traceback):
 		if exec_type:
-			error = "exec_type:%(exec_type)s|exec_value:%(exec_value)s|traceback:%(traceback)s" % {"exec_type": exec_type, "exec_value": exec_value, "traceback": traceback}
-			logger.error(error)
+			traceback_info = traceback.format_exception(exec_type, exec_value, traceback)
+			logger.error(traceback_info)
 			self.mysql.rollback()
 			# self.mysql.end("rollback")
 		else:
@@ -47,7 +48,7 @@ with mysql_context as mysql:
 
 
 def transcation(func):
-	# 事务的装饰器
+	# 事务装饰器
 	"""
 	@transcation
 	def mysql_execute():
