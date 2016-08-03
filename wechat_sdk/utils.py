@@ -79,3 +79,13 @@ def with_metaclass(meta, *bases):
             return meta(clsname, bases, d)
 
     return type.__new__(metaclass, "templory_class", (), {})
+
+
+def singleton(cls):
+    # 单例模式装饰器
+    instances_dict = {}
+    def wrap(*args, **kwargs):
+        if cls not in instances_dict:
+            instances_dict[cls] = cls(*args, **kwargs)
+        return instances_dict[cls]
+    return wrap

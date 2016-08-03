@@ -1,6 +1,8 @@
 # coding: utf-8
+from .utils import singleton
 
 
+@singleton
 class WechatConf(object):
 
     def __init__(self, appid=None, appsecret=None, token=None, aeskey=None, paysignkey=None):

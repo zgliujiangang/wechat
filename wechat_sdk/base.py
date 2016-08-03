@@ -11,8 +11,9 @@ from .conf import WechatConf, default_conf
 from .urls import ApiUrl
 from .error import ErrorHandler
 from .utils import random_str
+from .utils import singleton
 
-
+@singleton
 class Wechat(object):
 
     def __init__(self, conf=default_conf, err_handler=ErrorHandler, debug=False):
