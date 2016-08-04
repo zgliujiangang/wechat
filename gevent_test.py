@@ -3,20 +3,67 @@
 import select
 import socket
 
+class IOLoop:
+    READ = 0x001
+    WRITE = 0x004
+    ERROR = 0x008 | 0x010
+
+
 class Poll(object):
 
     instance = None
 
-    def __init__(self):
-        self.fd_pool = dict()
-        self.impl = _Select()
+    @classmethod
+    def current(cls):
+        if cls.instance is None:
+            cls.instance = _Select()
+        return cls.instance
+
+class FdManager(object):
+
+    def __init__(self, conn_handler=None):
+        self.fd_pool = {}
+        self.conn_handler = conn_handler
+
+    def handler(self, _fd, _event):
+        fd = self.fd_pool.get(_fd)
+        event = _event
+        if isinstance(fd, SocketFd):
+            if event == IOLoop.READ:
+                conn_fd = fd.read()
+                self.register(conn_fd, IOLoop.READ)
+            elif event == IOLoop.WRITE:
+                fd.write()
+            elif event == IOLoop.ERROR:
+                self.unregister(fd)
+                fd.error()
+                del fd
+        elif isinstance(fd, ConnectionFd):
+            if event == IOLoop.READ:
+                stream = fd.read()
+                self.register(fd, IOLoop.WRITE)
+            elif event == IOLoop.WRITE:
+                if fd.stream and self.conn_handler:
+                    stream = self.conn_handler(fd.stream)
+                    fd.write(stream)
+                else:
+                    fd.write("<html><body><p>yes you can do it</p></body></html>")
+                self.unregister(fd)
+                fd.close()
+                del fd
+            elif event == IOLoop.ERROR:
+                self.unregister(fd)
+                fd.error()
+                del fd
+        else:
+            raise ValueError(_fd)
 
     def register(self, fd, event):
-        self.impl.register(fd.fd, event)
+        Poll.current().register(fd.fd, event)
         self.fd_pool[fd.fd] = fd
 
     def unregister(self, fd):
-        self.impl.unregister(fd.fd)
+        Poll.current().unregister(fd.fd)
         self.fd_pool.pop(fd.fd)
 
     def modify(self, fd, event):
@@ -24,33 +71,28 @@ class Poll(object):
         self.register(fd, event)
 
     def poll(self):
-        events = self.impl.poll(1)
-        print events
-        events = [(self.fd_pool.get(fd), event) for fd, event in events]
-        return events
+        return Poll.current().poll(0.01)
 
-    @classmethod
-    def current(cls):
-        if cls.instance is None:
-            cls.instance = cls()
-        return cls.instance
 
 class PollRunner(object):
 
     @classmethod
     def run(cls):
-        poll = Poll.current()
+        def application(stream):
+            return stream
+        fd_manager = FdManager(conn_handler=application)
         s = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
         s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         s.bind(("127.0.0.1", 8000))
         s.setblocking(False)
         s.listen(10)
         s_fd = SocketFd(s)
-        poll.register(s_fd, IOLoop.READ)
+        fd_manager.register(s_fd, IOLoop.READ)
         while True:
-            events = poll.poll()
+            events = fd_manager.poll()
+            print events
             for fd, event in events:
-                fd.handler(event)
+                fd_manager.handler(fd, event)
 
 
 class AbstractFd(object):
@@ -59,28 +101,17 @@ class AbstractFd(object):
     def fd(self):
         raise NotImplementedError
 
-    def handler(self, event):
-        if event == IOLoop.READ:
-            self.read_handler()
-        elif event == IOLoop.WRITE:
-            self.write_handler()
-        elif event == IOLoop.ERROR:
-            self.error_handler()
-        else:
-            print 'happend an event:%s' % event
-            self.close()
-
-    def read_handler(self):
+    def read(self):
         raise NotImplementedError
 
-    def write_handler(self):
+    def write(self):
         raise NotImplementedError
 
-    def error_handler(self):
+    def error(self):
         raise NotImplementedError
 
     def close(self):
-        Poll.current().unregister(self)
+        raise NotImplementedError
 
 
 class SocketFd(AbstractFd):
@@ -92,67 +123,51 @@ class SocketFd(AbstractFd):
     def fd(self):
         return self.socket.fileno()
     
-    def read_handler(self):
+    def read(self):
         connection, address = self.socket.accept()
         connection.setblocking(False)
         connection_fd = ConnectionFd(connection)
-        Poll.current().register(connection_fd, IOLoop.READ)
+        return connection_fd
 
-    def write_handler(self):
+    def write(self):
         raise NotImplementedError
 
-    def error_handler(self):
+    def error(self):
+        print 'happend an error:%s' % self.fd
         self.close()
 
     def close(self):
-        super(SocketFd, self).close()
         self.socket.close()
-
-class IOLoop:
-    READ = 0x001
-    WRITE = 0x004
-    ERROR = 0x008 | 0x010
 
 
 class ConnectionFd(AbstractFd):
 
     def __init__(self, connection):
         self.connection = connection
-        self.stream = str()
+        self.stream = None
     
     @property
     def fd(self):
         return self.connection.fileno()
 
-    def read_handler(self):
+    def read(self):
         try:
             recv = self.connection.recv(1024)
+            self.stream = recv
+            return recv
         except socket.error:
-            self.close()
-        else:
-            if recv:
-                print 'recv length:%s'% len(recv)
-                self.stream += recv
-                print self.stream
-                self.set_write()
-            else:
-                print 'close connection'
-                self.close()
+            return None
+        finally:
+            return None
 
-    def set_write(self):
-        if getattr(self, "has_set_write", False) == True:
-            pass
-        else:
-            Poll.current().register(self, IOLoop.WRITE)
-            self.has_set_write = True
+    def write(self, stream):
+        self.connection.send(stream)
 
-    def write_handler(self):
-        print 'aaaa'
-        self.connection.send(self.stream)
+    def error(self):
+        print 'happend an error:%s' % self.fd
         self.close()
 
     def close(self):
-        super(ConnectionFd, self).close()
         self.connection.close()
 
 
