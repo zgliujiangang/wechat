@@ -20,5 +20,8 @@ if __name__ == '__main__':
 	while True:
 	    events = Poll.current().poll(0.1)
 	    print events
-	    for fd, event in events:
-			fd_manager.dispatch(fd, event)
+	    import gevent
+	    #from gevent import monkey;monkey.patch_all()
+	    gevent.joinall([gevent.spawn(fd_manager.dispatch, fd, event) for fd, event in events])
+	    #for fd, event in events:
+		#	fd_manager.dispatch(fd, event)
