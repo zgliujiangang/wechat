@@ -13,7 +13,7 @@ def fetch():
 
 
 def asyncfetch():
-    gevent.joinall([gevent.spawn(fetch) for i in range(1000)])
+    gevent.joinall([gevent.spawn(fetch) for i in range(10000)])
 
 
 if __name__ == '__main__':
