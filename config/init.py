@@ -1,10 +1,12 @@
 # coding: utf-8
 import platform
 import ConfigParser
-
+import os
 
 def read_config(file_name):
-    config = ConfigParser.RawConfigParser()
+    current_path = os.path.dirname(__file__)
+    file_name = os.path.join(current_path, file_name)
+    config = ConfigParser.ConfigParser()
     with open(file_name) as f:
         config.readfp(f)
     return config
@@ -22,10 +24,8 @@ def init_config():
 if __name__ == "__main__":
     config = init_config()
     print config
-    print dir(config)
-    print config.sections()
-    name = config.get("mysql", "name")
-    print name
+    redis_host = config.get("redis", "host")
+    print redis_host
     
 
     
