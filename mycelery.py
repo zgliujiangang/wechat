@@ -12,6 +12,7 @@ my_celery = Celery()
 
 @my_celery.task
 def async_task(func, args=[], kwargs={}):
+    # 这么做是不行的，因为func是不能序列化的东西
     try:
         func(*args, **kwargs)
     except Exception as err:

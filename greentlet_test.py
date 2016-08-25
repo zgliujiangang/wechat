@@ -8,11 +8,11 @@ def connect_hanlder(connection):
 
 
 def socket_accept(s):
-    while True:
+    while 1:
         try:
             connection, address = s.accept()
             connection.setblocking(False)
-            while True:
+            while 1:
                 try:
                     recv = connection.recv(1024)
                     connection.send(recv)
@@ -30,6 +30,7 @@ def socket_accept(s):
             s.close()
         finally:
             print 'loop finally'
+
 
 
 if __name__ == '__main__':

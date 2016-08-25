@@ -2,28 +2,34 @@
 import time
 
 def search(number, numbers):
-    length = len(numbers)
-    start = 1 - 0
-    end = length - 0
-    while True:
-        mid = start + (end - start) / 2
-        num = numbers[mid]
-        # print start
-        # print end
-        # print num
-        # print "aaaaa"
-        if num == number:
-            return mid
+    # 二分法查找
+    low = 0
+    height = len(numbers) - 1
+    while low < height:
+        mid = (height + low) / 2
+        if numbers[mid] > number:
+            height = mid - 1
+        elif numbers[mid] < number:
+            low = mid + 1
         else:
-            if start != end:
-                if num > number:
-                    start = start
-                    end = mid + 1
-                else:
-                    start = mid + 1
-                    end = end
-            else: 
-                raise ValueError("does not exist")
+            return mid
+    return -1
+
+
+def order(array):
+    # 冒泡排序
+    flag = False
+    for i in range(len(array)):
+        if not flag:
+            for j in range(len(array)-i):
+                flag = True 
+                if array[j] > array[j+1]:
+                    array[j+1], array[j] = array[j], array[j+1]
+                    flag = False
+        else:
+            break
+    return array
+
 
 numbers = [i for i in range(1000000)]
 

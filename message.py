@@ -1,17 +1,21 @@
-# message.py
-from geventwebsocket import WebSocketError
+# coding: utf-8
 
 
-class MessageServer(object):
+def test():
+    n = 1
+    while 1:
+        yield n 
+        n += 1
 
-    def __init__(self):
-        self.observers = []
 
-    def add_message(self, msg):
-        for ws in self.observers:
-            try:
-                ws.send(msg)
-            except WebSocketError:
-                self.observers.pop(self.observers.index(ws))
-                print ws, 'is closed'
-                continue
+if __name__ == "__main__":
+
+    my_func = test()
+    print type(my_func)
+    print my_func.next()
+    print my_func.next()
+    print my_func.next()
+    print dir(my_func)
+    print my_func.gi_code
+    print my_func.gi_frame
+    print my_func.gi_running

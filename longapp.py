@@ -24,7 +24,7 @@ def message():
     if request.environ.get('wsgi.websocket'):
         ws = request.environ['wsgi.websocket']
         msgsrv.observers.append(ws)
-        while True:
+        while 1:
             if ws:
                 message = ws.receive()
                 if message:
