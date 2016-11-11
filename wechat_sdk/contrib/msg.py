@@ -59,7 +59,6 @@ class MsgHandler(object):
             # 明文通讯
             self.msgcrypt = None
             self.response = clear_text_decorator(self.response)
-        self.response = partial(self.response, self)
 
     def route(self, msg_type):
         # msg_type是一个二元元祖,如("event", "click")
@@ -108,7 +107,7 @@ class MsgHandler(object):
         #param xml:post消息体中的xml字符串
         #param args:url上携带的参数字典
         if not auth:
-            return self.response(xml, args)
+            return self.response(self, xml, args)
         else:
             # 服务器接入验证
             return self.auth(args, self.wechat.token)
