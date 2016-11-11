@@ -38,6 +38,7 @@ class MsgHandler(object):
 
     def __init__(self, wechat, default="success", crypto=False):
         # crypto 是否加密[False:明文(未加密) True:密文(已加密)]
+        # 通过设置crypto可以动态改变加解密模式
         self.wechat = wechat
         self.default = default
         self.crypto = crypto
