@@ -16,7 +16,7 @@ from wechat_sdk import Wechat
 # 	#复写获取缓存数据的方法
 # 	def get_cache_data(self, key):
 # 		return redis.get(key)
-# wechat = MyWechat(conf=conf)
+# wechat = MyWechat(**kwargs)
 # access_token = wechat.access_token
 # jsapi_ticket = wechat.jsapi_ticket
 # ......
