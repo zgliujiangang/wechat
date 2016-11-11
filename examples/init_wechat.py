@@ -20,7 +20,7 @@ from wechat_sdk import Wechat
 # access_token = wechat.access_token
 # jsapi_ticket = wechat.jsapi_ticket
 # ......
-wechat = Wechat(appid="wxa8e2f9be2c6f347c", appsecret="0ed8890e310546b8ef45e1db174b2145", token="hrjiaweixin123")
+wechat = Wechat(appid="wxa8e2f9be2c6f347c", appsecret="0ed8890e310546b8ef45e1db174b2145", token="hrjiaweixin123", aeskey="aeskey")
 #直接访问属性access_token获取
 access_token = wechat.access_token
 #直接访问属性jsapi_ticket获取

@@ -42,9 +42,17 @@ class MsgHandler(object):
         self.default = default
         self.crypto = crypto
         self.register_funcs = dict()
-        if crypto:
+
+    @property
+    def crypto(self):
+        return self._crypto
+
+    @crypto.setter
+    def crypto(self, value):
+        self._crypto = value
+        if value:
             # 密文通讯
-            self.msgcrypt = WXBizMsgCrypt(wechat.token, wechat.aeskey, wechat.appid)
+            self.msgcrypt = WXBizMsgCrypt(self.wechat.token, self.wechat.aeskey, self.wechat.appid)
             self.response = cipher_text_decorator(self.response)
         else:
             # 明文通讯

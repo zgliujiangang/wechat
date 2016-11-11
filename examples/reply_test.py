@@ -40,7 +40,7 @@ def subscribe(params):
 #       # return reply(request.data, request.args, crypto=True)
 
 if __name__ == '__main__':
-	TEXT = """
+    TEXT = """
             <xml>
                 <ToUserName><![CDATA[111111]]></ToUserName>
                 <FromUserName><![CDATA[222222]]></FromUserName>
@@ -49,5 +49,6 @@ if __name__ == '__main__':
                 <Content><![CDATA[我一直很好，你也要一直好下去！]]></Content>
             </xml>
             """
-	print reply(ReplyTemplate.VIDEO)
-	print reply(TEXT)
+    print reply(ReplyTemplate.VIDEO)
+    reply.crypto = True
+    print reply(TEXT)
