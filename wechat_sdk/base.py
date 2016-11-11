@@ -10,7 +10,6 @@ import hashlib
 import logging
 from poster.encode import multipart_encode
 from poster.streaminghttp import register_openers
-from .conf import WechatConf, default_conf
 from .urls import ApiUrl
 from .error import ErrorHandler
 from .utils.common import random_str
@@ -78,12 +77,6 @@ class Wechat(object):
         jsapi_ticket_key = "%s:jsapi_ticket" % self.appid
         self.cache_data(jsapi_ticket_key, result["ticket"], result["expires_in"])
         return result["ticket"]
-
-    def dispatch_error(self, errcode):
-        if not self.debug:
-            print errcode
-        else:
-            self.err_handler.dispatch_error(errcode)
 
     def url_format(self, url):
         return url.format(appid=self.appid, appsecret=self.appsecret, 

@@ -3,7 +3,7 @@
 
 
 import json
-from ..utils import with_metaclass
+from ..utils.common import with_metaclass
 from ..urls import ApiUrl
 
 

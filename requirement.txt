@@ -1,3 +1,4 @@
 poster
 requests
-memcache
+python-memcached
+pycrypto

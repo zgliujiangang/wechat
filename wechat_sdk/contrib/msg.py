@@ -68,6 +68,9 @@ class MsgHandler(object):
         try:
             msg_type = self.convert(msg_type)
             return self.register_funcs[msg_type](params) or self.default
+        except KeyError as e:
+            logging.error(str(e))
+            return self.default
         except Exception as e:
             logging.error(str(e))
             raise e

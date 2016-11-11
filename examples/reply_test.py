@@ -4,9 +4,9 @@ import time
 sys.path.append("..")
 
 from examples.init_wechat import wechat
-from wechat_sdk.contrib.msg import Reply, ReplyTemplate
+from wechat_sdk.contrib.msg import MsgHandler, ReplyTemplate
 #自动回复消息测试
-reply = Reply(wechat, default="yes i am just a test")
+reply = MsgHandler(wechat, default="yes i am just a test")
 #设置密文模式：将mode设置为True
 #reply = Reply(wechat, default="yes i am just a test", mode=True)
 #如果是非事件消息，第二个值传空字符串，大小写无关
@@ -34,7 +34,10 @@ def subscribe(params):
 # 	if request.method = 'get':
 # 		return reply(request.args, auth=True)
 # 	else:
+#       # 明文
 # 		return reply(request.data)
+#       # 密文
+#       # return reply(request.data, request.args, crypto=True)
 
 if __name__ == '__main__':
 	TEXT = """

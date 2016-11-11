@@ -1,3 +1,7 @@
-# coding: utf-8
+# -*- coding: utf-8 -*-
+
+
 from .base import Wechat
-from .conf import WechatConf
+
+
+__all__ = ["Wechat"]
