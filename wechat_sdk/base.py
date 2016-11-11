@@ -5,9 +5,9 @@ import time
 import json
 import requests
 import urllib2
-import memcache
 import hashlib
 import logging
+from functools import partial
 from poster.encode import multipart_encode
 from poster.streaminghttp import register_openers
 from .urls import ApiUrl
@@ -24,22 +24,24 @@ class Wechat(object):
         self.aeskey = kwargs.pop("aeskey", None)
         self.paysignkey = kwargs.pop("paysignkey", None)
         self.err_handler = kwargs.pop("err_handler", ErrorHandler)
+        self.cache_data = kwargs.pop("cache_data", lambda a, b, c: NotImplemented)
+        self.get_cache_data = kwargs.pop("get_cache_data", lambda a: NotImplemented)
 
-    def cache_data(self, key, value, expires_in):
-        """
-        redis eg: 
-        redis.set(key, value, expires_in)
-        """
-        mc = memcache.Client(['127.0.0.1:11211'], debug=0)
-        mc.set(key, value, int(expires_in)-30)
+    @property
+    def cache_data(self):
+        return self._cache_data
 
-    def get_cache_data(self, key):
-        """
-        redis eg:
-        return redis.get(key)
-        """
-        mc = memcache.Client(['127.0.0.1:11211'], debug=0)
-        return mc.get(key)
+    @cache_data.setter
+    def cache_data(self, func):
+        self._cache_data = func
+
+    @property
+    def get_cache_data(self):
+        return self._get_cache_data
+
+    @get_cache_data.setter
+    def get_cache_data(self, func):
+        self._get_cache_data = func
 
     @property
     def access_token(self):
