@@ -1,6 +1,10 @@
-# coding: utf-8
+# -*- coding: utf-8 -*-
+
+
 from urllib import quote
 from ..urls import ApiUrl
+
+
 class AccountManager(object):
 
 	def __init__(self , wechat):

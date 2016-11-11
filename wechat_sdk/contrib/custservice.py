@@ -1,6 +1,8 @@
-# coding: utf-8
+# -*- coding: utf-8 -*-
+
 
 from ..urls import ApiUrl
+
 
 # TODO 目前只支持客服消息接口，未支持群发接口和模板消息接口
 class CustService(object):

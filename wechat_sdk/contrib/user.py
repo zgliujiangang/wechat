@@ -1,5 +1,8 @@
-# coding: utf-8
+# -*- coding: utf-8 -*-
+
+
 from ..urls import ApiUrl
+
 
 class UserManager(object):
 
@@ -40,4 +43,3 @@ class UserManager(object):
 	def get_userlist(self, next_openid=""):
 		url = ApiUrl.get_userlist % next_openid
 		return self.wechat.get(url)
-	

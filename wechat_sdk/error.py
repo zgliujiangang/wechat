@@ -1,4 +1,7 @@
-# coding: utf-8
+# -*- coding: utf-8 -*-
+
+
+import logging
 
 
 class WechatError(Exception):
@@ -159,9 +162,12 @@ class ErrorHandler(object):
     def dispatch_error(cls, errcode):
         error = cls.err_dict.get(str(errcode))
         if not error:
-            raise ValueError('can not find this errcode: %s' % errcode)
+            e = 'can not find this errcode: %s' % errcode
+            logging.error(e)
+            raise ValueError(e)
         else:
-            error = "%s:%s" % (errcode, error)
-            raise WechatError(error)
+            e = "%s:%s" % (errcode, error)
+            logging.error(e)
+            raise WechatError(e)
 
 

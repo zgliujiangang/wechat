@@ -1,9 +1,12 @@
-# coding: utf-8
+# -*- coding: utf-8 -*-
 # 素材管理
+
+
 import json
 from ..urls import ApiUrl
 
-class MediaType(object):
+
+class MediaType:
     image = "image"
     voice = "voice"
     video = "video"

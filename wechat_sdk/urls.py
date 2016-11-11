@@ -1,7 +1,7 @@
 # coding: utf-8
 
 
-class ApiUrl(object):
+class ApiUrl:
     # 微信ip地址列表
     wechat_ip = "https://api.weixin.qq.com/cgi-bin/getcallbackip?access_token={access_token}"
     # access_token获取接口

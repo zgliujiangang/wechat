@@ -1,7 +1,8 @@
-# coding: utf-8
+# -*- coding: utf-8 -*-
 # oauth2.0认证
+
+
 from urllib import quote
-from .. import Wechat
 from ..urls import ApiUrl
 
 
@@ -18,7 +19,6 @@ class Oauth2(object):
     url = "https://open.weixin.qq.com/connect/oauth2/authorize?appid=%s&redirect_uri=%s&response_type=code&scope=%s&state=%s#wechat_redirect"
 
     def __init__(self, wechat):
-        assert isinstance(wechat, Wechat), "wechat must be a Wechat instance"
         self.wechat = wechat
 
     def code_ex_token(self, code):

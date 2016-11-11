@@ -1,26 +1,30 @@
-# coding: utf-8
-import requests
+# -*- coding: utf-8 -*-
+
+
+import time
 import json
+import requests
 import urllib2
 import memcache
-import time
 import hashlib
+import logging
 from poster.encode import multipart_encode
 from poster.streaminghttp import register_openers
 from .conf import WechatConf, default_conf
 from .urls import ApiUrl
 from .error import ErrorHandler
-from .utils import random_str
-from .utils import singleton
+from .utils.common import random_str
 
-@singleton
+
 class Wechat(object):
 
-    def __init__(self, conf=default_conf, err_handler=ErrorHandler, debug=False):
-        assert isinstance(conf, WechatConf), "conf object must be a WechatConf instance!"
-        self.conf = conf
-        self.err_handler = err_handler
-        self.debug = debug
+    def __init__(self, **kwargs):
+        self.appid = kwargs.pop("appid")
+        self.appsecret = kwargs.pop("appsecret")
+        self.token = kwargs.pop("token", None)
+        self.aeskey = kwargs.pop("aeskey", None)
+        self.paysignkey = kwargs.pop("paysignkey", None)
+        self.err_handler = kwargs.pop("err_handler", ErrorHandler)
 
     def cache_data(self, key, value, expires_in):
         """
@@ -38,47 +42,42 @@ class Wechat(object):
         mc = memcache.Client(['127.0.0.1:11211'], debug=0)
         return mc.get(key)
 
-    def get_access_token(self):
-        access_token_key = "%s:access_token" % self.conf.appid
+    @property
+    def access_token(self):
+        access_token_key = "%s:access_token" % self.appid
         access_token = self.get_cache_data(access_token_key)
         if not access_token:
-            print "here init access_token"
+            logging.info("init access_token...")
             access_token = self.init_access_token()
         return access_token
 
     def init_access_token(self):
         # 每日有调用次数上限，需要缓存结果
-        resp = requests.get(ApiUrl.token.format(appid=self.conf.appid, appsecret=self.conf.appsecret))
+        resp = requests.get(ApiUrl.token.format(appid=self.appid, appsecret=self.appsecret))
         result = json.loads(resp.text)
         access_token = result.get("access_token")
         expires_in = result.get("expires_in")
         if access_token and expires_in:
-            access_token_key = "%s:access_token" % self.conf.appid
+            access_token_key = "%s:access_token" % self.appid
             self.cache_data(access_token_key, access_token, expires_in)
             return access_token
         self.err_handler.dispatch_error(result.get("errcode"))
 
-    access_token = property(get_access_token)
-    del get_access_token
-
-    def get_jsapi_ticket(self):
-        jsapi_ticket_key = "%s:jsapi_ticket" % self.conf.appid
+    @property
+    def jsapi_ticket(self):
+        jsapi_ticket_key = "%s:jsapi_ticket" % self.appid
         jsapi_ticket = self.get_cache_data(jsapi_ticket_key)
         if not jsapi_ticket:
-            print "here init jsapi_ticket"
+            print "init jsapi_ticket..."
             jsapi_ticket = self.init_jsapi_ticket()
         return jsapi_ticket
 
     def init_jsapi_ticket(self):
         # 每日有调用次数上限，需要缓存结果
-        with self:
-            result = self.get(ApiUrl.jsapi_ticket)
-        jsapi_ticket_key = "%s:jsapi_ticket" % self.conf.appid
+        result = self.get(ApiUrl.jsapi_ticket)
+        jsapi_ticket_key = "%s:jsapi_ticket" % self.appid
         self.cache_data(jsapi_ticket_key, result["ticket"], result["expires_in"])
         return result["ticket"]
-
-    jsapi_ticket = property(get_jsapi_ticket)
-    del get_jsapi_ticket
 
     def dispatch_error(self, errcode):
         if not self.debug:
@@ -87,8 +86,8 @@ class Wechat(object):
             self.err_handler.dispatch_error(errcode)
 
     def url_format(self, url):
-        return url.format(appid=self.conf.appid, appsecret=self.conf.appsecret, 
-                            token=self.conf.token, access_token=self.access_token)
+        return url.format(appid=self.appid, appsecret=self.appsecret, 
+                            token=self.token, access_token=self.access_token)
 
     def get(self, url, params=None):
         url = self.url_format(url)
@@ -96,7 +95,7 @@ class Wechat(object):
         result = json.loads(resp.text)
         errcode = result.get("errcode")
         if errcode and str(errcode) != "0":
-            self.dispatch_error(errcode)
+            self.err_handler.dispatch_error(errcode)
         return result
 
     def post(self, url, data=None):
@@ -108,7 +107,7 @@ class Wechat(object):
         result = json.loads(resp.text)
         errcode = result.get("errcode")
         if errcode and str(errcode) != "0":
-            self.dispatch_error(errcode)
+            self.err_handler.dispatch_error(errcode)
         return result
 
     def upload(self, url, **file_form):
@@ -120,7 +119,7 @@ class Wechat(object):
         result = json.loads(urllib2.urlopen(request).read())
         errcode = result.get("errcode")
         if errcode and str(errcode) != "0":
-            self.dispatch_error(errcode)
+            self.err_handler.dispatch_error(errcode)
         return result
 
     def download(self, url, data=None):
@@ -129,14 +128,14 @@ class Wechat(object):
         resp = urllib2.urlopen(url, data=json.dumps(data)).read()
         try:
             result = json.loads(resp)
-            print result
             errcode = result.get("errcode")
             if errcode and str(errcode) != "0":
-                self.dispatch_error(errcode)
+                self.err_handler.dispatch_error(errcode)
             # 有的素材会返回media_id所以能被json解析不代表未返回素材
             return {"type": "json", "result": result}
         except Exception as e:
-            print "maybe download file successfully"
+            logging.error(str(e))
+            logging.info("maybe download file successfully")
             # resp可以用StringIO.StringIO(resp)处理
             return {"type": "buffer", "result": resp}
 
@@ -149,16 +148,5 @@ class Wechat(object):
         items.sort(key=lambda x: x[0])
         params_string = '&'.join(['%s=%s' % item for item in items])
         signature = hashlib.sha1(params_string).hexdigest()
-        return dict(appId=self.conf.appid, timestamp=timestamp, nonceStr=noncestr, signature=signature)
-
-    def __enter__(self):
-        # with self:开启debug模式，接口调用未成功会抛出异常
-        self.real_debug = self.debug
-        self.debug = True
-
-    def __exit__(self, exc_type, exc_value, traceback):
-        # debug恢复原有状态
-        self.debug = self.real_debug
-        del self.real_debug 
-
+        return dict(appId=self.appid, timestamp=timestamp, nonceStr=noncestr, signature=signature)
 

@@ -1,11 +1,15 @@
-# coding: utf-8
+# -*- coding: utf-8 -*-
 # 自定义菜单
+
+
 import json
 from ..utils import with_metaclass
 from ..urls import ApiUrl
 
-type_set = frozenset(['click', 'view', 'scancode_push', 'scancode_waitmsg', 'pic_sysphoto', \
+
+menu_set = frozenset(['click', 'view', 'scancode_push', 'scancode_waitmsg', 'pic_sysphoto', \
     'pic_photo_or_album', 'pic_weixin', 'location_select', 'media_id', 'view_limited'])
+
 
 class MenuMeta(type):
 
@@ -13,7 +17,7 @@ class MenuMeta(type):
         menu_type = d.get("type")
         if not menu_type:
             raise KeyError("has no attribute: type")
-        if menu_type.lower() not in type_set:
+        if menu_type.lower() not in menu_set:
             raise AttributeError("has no such type")
         return type.__new__(cls, clsname, bases, d)
 
@@ -27,6 +31,7 @@ class MenuBase(object):
 
 
 Menu = with_metaclass(MenuMeta, MenuBase)
+
 
 class ClickMenu(Menu):
 
@@ -46,6 +51,7 @@ class ViewMenu(Menu):
         self.name = name
         self.url = url
         self.params = {'url': url}
+
 
 class MediaMenu(Menu):
 
@@ -127,7 +133,6 @@ class view_limitedMenu(Menu):
         self.params = {'media_id': media_id}
 
 
-# menu container
 class MenuGroup(MenuBase):
 
     def __init__(self, *args, **kwargs):
@@ -139,6 +144,7 @@ class MenuGroup(MenuBase):
     def menu(self):
         return {"name": self.name, "sub_button": [menu.menu() for menu in self.menu_list]}
 
+
 class MenuGroups(object):
 
     menu = None
@@ -147,6 +153,7 @@ class MenuGroups(object):
             raise Exception("一级菜单不能超过三个，现有%s个一级菜单" % len(group_list))
         self.menu = {"button": [group.menu() for group in group_list]}
         self.group_list = group_list
+
 
 class MenuManager(object):
 
