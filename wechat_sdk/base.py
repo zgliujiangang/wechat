@@ -17,7 +17,7 @@ from .utils import cache
 from .utils.common import random_str
 
 
-class Wechat(object):
+class WechatClient(object):
 
     def __init__(self, appid, appsecret, **kwargs):
         """微信api client类
@@ -170,4 +170,9 @@ class Wechat(object):
         params_string = '&'.join(['%s=%s' % item for item in items])
         signature = hashlib.sha1(params_string).hexdigest()
         return dict(appId=self.appid, timestamp=timestamp, nonceStr=noncestr, signature=signature)
+
+    def patch(self, menu=False):
+        if menu:
+            from .contrib import menu
+            menu.create = partial(menu.create, self)
 

@@ -7,168 +7,197 @@ from ..utils.common import with_metaclass
 from ..urls import ApiUrl
 
 
-menu_set = frozenset(['click', 'view', 'scancode_push', 'scancode_waitmsg', 'pic_sysphoto', \
+# 菜单按钮类型集合
+BUTTON_SET = frozenset(['click', 'view', 'scancode_push', 'scancode_waitmsg', 'pic_sysphoto', \
     'pic_photo_or_album', 'pic_weixin', 'location_select', 'media_id', 'view_limited'])
 
 
-class MenuMeta(type):
+class ButtonMeta(type):
 
     def __new__(cls, clsname, bases, d):
-        menu_type = d.get("type")
-        if not menu_type:
-            raise KeyError("has no attribute: type")
-        if menu_type.lower() not in menu_set:
-            raise AttributeError("has no such type")
+        button_type = d.get("Meta").button_type
+        if button_type.lower() not in BUTTON_SET:
+            raise AttributeError("has no such type: %s" % button_type)
         return type.__new__(cls, clsname, bases, d)
 
 
-class MenuBase(object):
+class ButtonBase(object):
 
-    def menu(self):
-        menu_dict = {"type": self.type.lower(), "name": self.name}
-        menu_dict.update(self.params)
-        return menu_dict
+    @property
+    def data(self):
+        _data = {}
+        meta_cls = self.Meta
+        for field in meta_cls.field_list:
+            _data[field] = getattr(self, field)
+        _data["type"] = meta_cls.button_type
+        return _data
 
 
-Menu = with_metaclass(MenuMeta, MenuBase)
+Button = with_metaclass(ButtonMeta, ButtonBase)
 
 
-class ClickMenu(Menu):
+class clickButton(Button):
+    # 点击
 
-    type = 'click'
-    
-    def __init__(self, name=None, key=None):
+    def __init__(self, name, key):
         self.name = name
         self.key = key
-        self.params = {'key': key}
+
+    class Meta:
+        button_type = "click"
+        field_list = ("name", "key")
 
 
-class ViewMenu(Menu):
-
-    type = 'view'
+class viewButton(Button):
+    # 链接
     
-    def __init__(self, name=None, url=None):
+    def __init__(self, name, url):
         self.name = name
         self.url = url
-        self.params = {'url': url}
+
+    class Meta:
+        button_type = "view"
+        field_list = ("name", "url")
 
 
-class MediaMenu(Menu):
-
-    type = 'media_id'
+class mediaButton(Button):
+    # 图片
     
-    def __init__(self, name=None, media_id=None):
+    def __init__(self, name, media_id):
         self.name = name
         self.media_id = media_id
-        self.params = {'media_id': media_id}
+
+    class Meta:
+        button_type = "media_id"
+        field_list = ("name", "media_id")
 
 
-class scancode_pushMenu(Menu):
-
-    type = 'scancode_push'
+class scancode_pushButton(Button):
+    # 扫码推事件
     
-    def __init__(self, name=None, key=None):
+    def __init__(self, name, key):
         self.name = name
         self.key = key
-        self.params = {'key': key}
+
+    class Meta:
+        button_type = "scancode_push"
+        field_list = ("name", "key")
 
 
-class scancode_waitmsgMenu(Menu):
-
-    type = 'scancode_waitmsg'
+class scancode_waitmsgMenu(Button):
+    # 扫码带提示
     
-    def __init__(self, name=None, key=None):
+    def __init__(self, name, key):
         self.name = name
         self.key = key
-        self.params = {'key': key}
+
+    class Meta:
+        button_type = "scancode_waitmsg"
+        field_list = ("name", "key")
 
 
-class pic_sysphotoMenu(Menu):
-
-    type = 'pic_sysphoto'
+class pic_sysphotoButton(Button):
+    # 系统拍照发图
     
-    def __init__(self, name=None, key=None):
+    def __init__(self, name, key):
         self.name = name
         self.key = key
-        self.params = {'key': key}
+
+    class Meta:
+        button_type = "pic_sysphoto"
+        field_list = ("name", "key")
 
 
-class pic_photo_or_albumMenu(Menu):
-
-    type = 'pic_photo_or_album'
+class pic_photo_or_albumButton(Button):
+    # 拍照或者相册发图
     
-    def __init__(self, name=None, key=None):
+    def __init__(self, name, key):
         self.name = name
         self.key = key
-        self.params = {'key': key}
+
+    class Meta:
+        button_type = "pic_photo_or_album"
+        field_list = ("name", "key")
 
 
-class pic_weixinMenu(Menu):
-
-    type = 'pic_weixin'
+class pic_weixinButton(Button):
+    # 微信相册发图
     
-    def __init__(self, name=None, key=None):
+    def __init__(self, name, key):
         self.name = name
         self.key = key
-        self.params = {'key': key}
+
+    class Meta:
+        button_type = "pic_weixin"
+        field_list = ("name", "key")
 
 
-class location_selectMenu(Menu):
+class location_selectButton(Button):
+    # 发送位置
 
-    type = 'location_select'
-    
-    def __init__(self, name=None, key=None):
+    def __init__(self, name, key):
         self.name = name
         self.key = key
-        self.params = {'key': key}
+
+    class Meta:
+        button_type = "location_select"
+        field_list = ("name", "key")
 
 
-class view_limitedMenu(Menu):
-
-    type = 'view_limited'
+class view_limitedButton(Button):
+    # 图文消息
     
-    def __init__(self, name=None, media_id=None):
+    def __init__(self, name, media_id):
         self.name = name
         self.media_id = media_id
-        self.params = {'media_id': media_id}
+
+    class Meta:
+        button_type = "view_limited"
+        field_list = ("name", "media_id")
 
 
-class MenuGroup(MenuBase):
+class SubButtonGroup(ButtonBase):
+    # 二级菜单组
 
-    def __init__(self, *args, **kwargs):
-        if len(args) > 5:
-            raise Exception("二级菜单最多不能超过5个，现有%s个二级菜单" % len(args))
-        self.name = kwargs.pop("name")
-        self.menu_list = args
+    def __init__(self, name, *button_list):
+        if len(button_list) > 5:
+            raise Exception("二级菜单按钮最多不能超过5个，现有%s个二级菜单按钮" % len(button_list))
+        self.name = name
+        self.button_list = button_list
     
-    def menu(self):
-        return {"name": self.name, "sub_button": [menu.menu() for menu in self.menu_list]}
+    @property
+    def data(self): 
+        return {"name": self.name, "sub_button": [button.data for button in self.button_list]}
 
 
-class MenuGroups(object):
+class MainButtonGroup(ButtonBase):
+    # 一级菜单组
 
-    menu = None
-    def __init__(self, *group_list):
-        if len(group_list) > 3:
-            raise Exception("一级菜单不能超过三个，现有%s个一级菜单" % len(group_list))
-        self.menu = {"button": [group.menu() for group in group_list]}
-        self.group_list = group_list
+    def __init__(self, *button_list):
+        if len(button_list) > 3:
+            raise Exception("一级菜单不能超过三个，现有%s个一级菜单" % len(button_list))
+        self.button_list = button_list
+
+    @property
+    def data(self):
+        return {"button": [button.data for button in self.button_list]}
 
 
-class MenuManager(object):
+class Manager(object):
 
-    def __init__(self, wechat):
-        self.wechat = wechat
+    def __init__(self, wc):
+        self.wc = wc
 
-    def create_menu(self, data):
-        if isinstance(data, MenuGroups):
-            data = data.menu
-        return self.wechat.post(ApiUrl.create_menu, data=data)
+    def create(self, data):
+        # 自定义菜单创建
+        if isinstance(data, MainButtonGroup):
+            data = data.data
+        return self.wc.post(ApiUrl.create_menu, data=data)
 
-    def get_menu(self):
-        return self.wechat.get(ApiUrl.get_menu)
+    def get(self):
+        # 自定义菜单查询
+        return self.wc.get(ApiUrl.get_menu)
 
-    def delete_menu(self):
-        return self.wechat.get(ApiUrl.delete_menu)
-
-    
+    def delete(self):
+        # 自定义菜单删除
+        return self.wc.get(ApiUrl.delete_menu)
