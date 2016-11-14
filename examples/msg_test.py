@@ -13,7 +13,8 @@ msg_handler = MsgHandler(wc, default="Hello World")
 # msg_handler = MsgHandler(wc, default="Hello World", crypto=True)
 
 
-# 文本消息，第二个值传空字符串，大小写无关
+# router方法接受一个二元元祖，第一个参数对应xml中的msg_type,第二个参数对应event,如果没有event,则传空字符串
+# 文本消息
 @msg_handler.route(("text", ""))
 def text(xml_tree):
     return ReplyTemplate.TEXT % (xml_tree.find("FromUserName").text, xml_tree.find("ToUserName").text, \
