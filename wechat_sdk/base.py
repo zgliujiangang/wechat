@@ -12,20 +12,31 @@ from poster.encode import multipart_encode
 from poster.streaminghttp import register_openers
 from .urls import ApiUrl
 from .error import ErrorHandler
+from .utils import cache
 from .utils.common import random_str
 
 
 class Wechat(object):
 
-    def __init__(self, **kwargs):
-        self.appid = kwargs.pop("appid")
-        self.appsecret = kwargs.pop("appsecret")
+    def __init__(self, appid, appsecret, **kwargs):
+        """微信api client类
+        @param appid: 公众号的appid
+        @param appsecret: 公众号的appsecret
+        @param token: 用于消息加解密的token
+        @param aeskey: 用于消息加解密的aeskey
+        @param paysignkey: 用于支付签名的key
+        @param err_handler: 错误处理的类
+        @param cache_data: 实现数据缓存的方法, 接受三个参数key, value, expires_in
+        @param get_cache_data: 实现获取缓存数据的方法, 接受一个参数key
+        """
+        self.appid = appid
+        self.appsecret = appsecret
         self.token = kwargs.pop("token", None)
         self.aeskey = kwargs.pop("aeskey", None)
         self.paysignkey = kwargs.pop("paysignkey", None)
         self.err_handler = kwargs.pop("err_handler", ErrorHandler)
-        self.cache_data = kwargs.pop("cache_data", lambda a, b, c: NotImplemented)
-        self.get_cache_data = kwargs.pop("get_cache_data", lambda a: NotImplemented)
+        self.cache_data = kwargs.pop("cache_data", cache.set)
+        self.get_cache_data = kwargs.pop("get_cache_data", cache.get)
 
     @property
     def cache_data(self):

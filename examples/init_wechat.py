@@ -30,7 +30,7 @@ def get_cache_data(key):
     return mc.get(key)
 
 wechat = Wechat(appid="wxa8e2f9be2c6f347c", appsecret="0ed8890e310546b8ef45e1db174b2145", 
-    token="hrjiaweixin123", aeskey="aeskey", cache_data=cache_data, get_cache_data=get_cache_data)
+    token="hrjiaweixin123", aeskey="aeskey")
 
 
 #wechat.cache_data = cache_data
