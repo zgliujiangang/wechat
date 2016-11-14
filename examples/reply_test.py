@@ -28,7 +28,8 @@ def subscribe(params):
 		int(time.time()), content)
 
 # Flask示例
-# from flask import request
+# from flask import Flask
+# app = Flask(__name__)
 # @app.route("/wechat/callback/")
 # def wechat_callback():
 # 	if request.method = 'get':
@@ -37,7 +38,9 @@ def subscribe(params):
 #       # 明文
 # 		return reply(request.data)
 #       # 密文
-#       # return reply(request.data, request.args, crypto=True)
+#       # return reply(request.data, request.args)
+# if __name__ == "__main__":
+#     app.run(debug=True)
 
 if __name__ == '__main__':
     TEXT = """
@@ -46,9 +49,10 @@ if __name__ == '__main__':
                 <FromUserName><![CDATA[222222]]></FromUserName>
                 <CreateTime>111111111111</CreateTime>
                 <MsgType><![CDATA[text]]></MsgType>
-                <Content><![CDATA[我一直很好，你也要一直好下去！]]></Content>
+                <Content><![CDATA[hello world!]]></Content>
             </xml>
             """
     print reply(ReplyTemplate.VIDEO)
-    reply.crypto = True
     print reply(TEXT)
+    #reply.crypto = True
+    #print reply(TEXT)

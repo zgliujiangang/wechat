@@ -1,1 +1,0 @@
-# 此文件夹缓存序列化的python object

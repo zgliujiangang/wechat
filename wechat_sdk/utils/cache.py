@@ -9,9 +9,6 @@ import os
 import time
 
 
-CACHE_DIR = os.path.join(os.path.dirname(__file__), ".cache")
-
-
 class CacheData:
     "用于序列化存入文件的cache类，适用单点服务缓存，多点服务实例请使用redis、memcache等专业缓存工具"
 
@@ -33,15 +30,15 @@ class CacheData:
             return self._value
 
 
-def set(key, value, expire_in):
+def set(cache_dir, key, value, expire_in):
     data = CacheData(key, value, expire_in)
-    cache_file = os.path.join(CACHE_DIR, data.key)
+    cache_file = os.path.join(cache_dir, data.key)
     with open(cache_file, "w") as f:
         pickle.dump(data, f)
 
 
-def get(key):
-    cache_file = os.path.join(CACHE_DIR, key)
+def get(cache_dir, key):
+    cache_file = os.path.join(cache_dir, key)
     if not os.path.exists(cache_file):
         return None
     else:

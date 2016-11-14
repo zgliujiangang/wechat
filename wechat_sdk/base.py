@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 
+import os
 import time
 import json
 import requests
@@ -23,20 +24,34 @@ class Wechat(object):
         @param appid: 公众号的appid
         @param appsecret: 公众号的appsecret
         @param token: 用于消息加解密的token
-        @param aeskey: 用于消息加解密的aeskey
+        @param aeskey: 用于消息加解密的EncodingAESKey
         @param paysignkey: 用于支付签名的key
         @param err_handler: 错误处理的类
+        @param cache_dir: 存放缓存数据的目录，如果未传cache_data或者get_cache_data参数，则必须传入此参数
         @param cache_data: 实现数据缓存的方法, 接受三个参数key, value, expires_in
         @param get_cache_data: 实现获取缓存数据的方法, 接受一个参数key
         """
         self.appid = appid
         self.appsecret = appsecret
-        self.token = kwargs.pop("token", None)
-        self.aeskey = kwargs.pop("aeskey", None)
-        self.paysignkey = kwargs.pop("paysignkey", None)
-        self.err_handler = kwargs.pop("err_handler", ErrorHandler)
-        self.cache_data = kwargs.pop("cache_data", cache.set)
-        self.get_cache_data = kwargs.pop("get_cache_data", cache.get)
+        self.token = kwargs.get("token", None)
+        self.aeskey = kwargs.get("aeskey", None)
+        self.paysignkey = kwargs.get("paysignkey", None)
+        self.err_handler = kwargs.get("err_handler", ErrorHandler)
+        cache_dir = kwargs.get("cache_dir")
+        cache_data = kwargs.get("cache_data")
+        get_cache_data = kwargs.get("get_cache_data")
+        if cache_data and get_cache_data:
+            self.cache_dir = None
+            self.cache_data = cache_data
+            self.get_cache_data = get_cache_data
+        else:
+            if cache_dir is None:
+                raise ValueError("cache dir param is required")
+            if not os.path.isdir(cache_dir):
+                raise ValueError("cache dir must be a valid folder")
+            self.cache_dir = cache_dir
+            self.cache_data = partial(cache.set, cache_dir)
+            self.get_cache_data = partial(cache.get, cache_dir)
 
     @property
     def cache_data(self):
