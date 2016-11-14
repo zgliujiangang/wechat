@@ -11,6 +11,7 @@ cache_dir = os.path.join(os.path.dirname(__file__), "cache_dir")
 wc = WechatClient(appid="wxa8e2f9be2c6f347c", appsecret="0ed8890e310546b8ef45e1db174b2145", 
     token="hrjiaweixin123", aeskey="aeskey", cache_dir=cache_dir)
 
+
 # 如果自定义cache_data和get_cache_data方法则无须传入cache_dir
 # import memcache
 # def cache_data(key, value, expires_in):

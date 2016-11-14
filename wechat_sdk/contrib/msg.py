@@ -4,17 +4,28 @@
 
 import logging
 import hashlib
-from functools import wraps, partial
-from ..utils.common import xml_to_dict, random_str
-from ..wx_crypto.WXBizMsgCrypt import WXBizMsgCrypt
+from functools import wraps
+try:
+    import xml.etree.cElementTree as ET
+except ImportError:
+    import xml.etree.ElementTree as ET
+from ..utils.common import random_str
 
 
 def clear_text_decorator(func):
     # 明文模式装饰器
     @wraps(func)
     def decorator(msg_handler, xml, args):
-        params = xml_to_dict(xml)
-        response = func((params.get("MsgType"), params.get("Event", "")), params)
+        xml_tree = ET.fromstring(xml)
+        try:
+            msg_type = xml_tree.find("MsgType").text
+        except AttributeError:
+            msg_type = ""
+        try:
+            event = xml_tree.find("Event").text
+        except AttributeError:
+            event = ""
+        response = func((msg_type, event), xml_tree)
         return response
     return decorator
 
@@ -25,8 +36,16 @@ def cipher_text_decorator(func):
     def decorator(msg_handler, xml, args):
         de_ret, xml = msg_handler.msgcrypt.DecryptMsg(xml, args.get("msg_signature"), 
             args.get("timestamp"), args.get("nonce"))
-        params = xml_to_dict(xml)
-        response = func((params.get("MsgType"), params.get("Event", "")), params)
+        xml_tree = ET.fromstring(xml)
+        try:
+            msg_type = xml_tree.find("MsgType").text
+        except AttributeError:
+            msg_type = ""
+        try:
+            event = xml_tree.find("Event").text
+        except AttributeError:
+            event = ""
+        response = func((msg_type, event), xml_tree)
         nonce = random_str(min_length=10, max_length=10)
         en_ret, response = msg_handler.msgcrypt.EncryptMsg(response, nonce)
         return response
@@ -36,10 +55,10 @@ def cipher_text_decorator(func):
 class MsgHandler(object):
     #回复微信消息的类
 
-    def __init__(self, wechat, default="success", crypto=False):
+    def __init__(self, wc, default="success", crypto=False):
         # crypto 是否加密[False:明文(未加密) True:密文(已加密)]
         # 通过设置crypto可以动态改变加解密模式
-        self.wechat = wechat
+        self.wc = wc
         self.default = default
         self.crypto = crypto
         self.register_funcs = dict()
@@ -53,7 +72,8 @@ class MsgHandler(object):
         self._crypto = value
         if value:
             # 密文通讯
-            self.msgcrypt = WXBizMsgCrypt(self.wechat.token, self.wechat.aeskey, self.wechat.appid)
+            from ..wx_crypto.WXBizMsgCrypt import WXBizMsgCrypt
+            self.msgcrypt = WXBizMsgCrypt(self.wc.token, self.wc.aeskey, self.wc.appid)
             self.response = cipher_text_decorator(self.response)
         else:
             # 明文通讯
@@ -110,7 +130,7 @@ class MsgHandler(object):
             return self.response(self, xml, args)
         else:
             # 服务器接入验证
-            return self.auth(args, self.wechat.token)
+            return self.auth(args, self.wc.token)
 
 
 class ReplyTemplate(object):

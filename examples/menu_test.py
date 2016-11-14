@@ -1,7 +1,7 @@
-# coding: utf-8
-import sys
-sys.path.append("..")
+# -*- coding: utf-8 -*-
 
+
+import sys; sys.path.append("..")
 from examples.base_test import wc
 from wechat_sdk.contrib.menu import mediaButton, clickButton, \
 viewButton, SubButtonGroup, MainButtonGroup, Manager
