@@ -50,19 +50,19 @@ if __name__ == '__main__':
 
 
 # Flask示例
-from flask import Flask
+# from flask import Flask
 
-app = Flask(__name__)
+# app = Flask(__name__)
 
-@app.route("/msg/callback/")
-def msg_callback():
-    if request.method = 'get':
-        return reply(request.args, auth=True)
-    else:
-        # 明文
-        return reply(request.data)
-        # 密文
-        # return reply(request.data, request.args)
+# @app.route("/msg/callback/")
+# def msg_callback():
+#     if request.method = 'get':
+#         return reply(request.args, auth=True)
+#     else:
+#         # 明文
+#         return reply(request.data)
+#         # 密文
+#         # return reply(request.data, request.args)
 
-if __name__ == "__main__":
-    app.run(debug=True)
+# if __name__ == "__main__":
+#     app.run(debug=True)
