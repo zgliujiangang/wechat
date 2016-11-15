@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 
-from .base import WechatClient
+from .base import WechatApp
 
 
-__all__ = ["WechatClient"]
+__all__ = ["WechatApp"]

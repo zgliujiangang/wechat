@@ -2,13 +2,13 @@
 
 
 import sys; sys.path.append("..")
-from examples.base_test import wc
+from examples.base_test import wechat_app
 from wechat_sdk.contrib.menu import mediaButton, clickButton, \
 viewButton, SubButtonGroup, MainButtonGroup, MenuManager
 
 
 def test():
-    menu_manager = MenuManager(wc)
+    menu_manager = MenuManager(wechat_app)
     click1 = clickButton(name="点击1", key="1111")
     click2 = clickButton(name="点击2", key='2222')
     click3 = clickButton(name="点击3", key="333")

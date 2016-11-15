@@ -13,23 +13,22 @@ from poster.encode import multipart_encode
 from poster.streaminghttp import register_openers
 from .urls import ApiUrl
 from .error import ErrorHandler
-from .utils import cache
+from .utils.cache import BaseCache, PickleCache
 from .utils.common import random_str
 
 
-class WechatClient(object):
+class WechatApp(object):
 
     def __init__(self, appid, appsecret, **kwargs):
-        """微信api client类
+        """微信api访问类
         @param appid: 公众号的appid
         @param appsecret: 公众号的appsecret
         @param token: 用于消息加解密的token
         @param aeskey: 用于消息加解密的EncodingAESKey
         @param paysignkey: 用于支付签名的key
         @param err_handler: 错误处理的类
-        @param cache_dir: 存放缓存数据的目录，如果未传cache_data或者get_cache_data参数，则必须传入此参数
-        @param cache_data: 实现数据缓存的方法, 接受三个参数key, value, expires_in
-        @param get_cache_data: 实现获取缓存数据的方法, 接受一个参数key
+        @param cache_dir: 存放缓存数据的目录，如果未传cache参数，则必须传入此参数
+        @param cache: 实现数据缓存的实例, 有set, get, delete三个方法，继承自BaseCache
         """
         self.appid = appid
         self.appsecret = appsecret
@@ -37,42 +36,25 @@ class WechatClient(object):
         self.aeskey = kwargs.get("aeskey", None)
         self.paysignkey = kwargs.get("paysignkey", None)
         self.err_handler = kwargs.get("err_handler", ErrorHandler)
-        cache_dir = kwargs.get("cache_dir")
-        cache_data = kwargs.get("cache_data")
-        get_cache_data = kwargs.get("get_cache_data")
-        if cache_data and get_cache_data:
-            self.cache_dir = None
-            self.cache_data = cache_data
-            self.get_cache_data = get_cache_data
+        cache = kwargs.get("cache")
+        if cache:
+            assert isinstance(cache, BaseCache), "cache必须是BaseCache的实例"
+            self.cache = cache
         else:
-            if cache_dir is None:
-                raise ValueError("cache dir param is required")
-            if not os.path.isdir(cache_dir):
-                raise ValueError("cache dir must be a valid folder")
-            self.cache_dir = cache_dir
-            self.cache_data = partial(cache.set, cache_dir)
-            self.get_cache_data = partial(cache.get, cache_dir)
+            cache_dir = kwargs.get("cache_dir")
+            self.cache = PickleCache(cache_dir)
 
     @property
-    def cache_data(self):
-        return self._cache_data
-
-    @cache_data.setter
-    def cache_data(self, func):
-        self._cache_data = func
+    def access_token_key(self):
+        return "%s:access_token" % self.appid
 
     @property
-    def get_cache_data(self):
-        return self._get_cache_data
-
-    @get_cache_data.setter
-    def get_cache_data(self, func):
-        self._get_cache_data = func
+    def jsapi_ticket_key(self):
+        return "%s:jsapi_ticket" % self.appid
 
     @property
     def access_token(self):
-        access_token_key = "%s:access_token" % self.appid
-        access_token = self.get_cache_data(access_token_key)
+        access_token = self.cache.get(self.access_token_key)
         if not access_token:
             logging.info("init access_token...")
             access_token = self.init_access_token()
@@ -85,26 +67,29 @@ class WechatClient(object):
         access_token = result.get("access_token")
         expires_in = result.get("expires_in")
         if access_token and expires_in:
-            access_token_key = "%s:access_token" % self.appid
-            self.cache_data(access_token_key, access_token, expires_in)
+            self.cache.set(self.access_token_key, access_token, expires_in)
             return access_token
         self.err_handler.dispatch_error(result.get("errcode"))
 
+    def delete_access_token(self):
+        self.cache.delete(self.access_token_key)
+
     @property
     def jsapi_ticket(self):
-        jsapi_ticket_key = "%s:jsapi_ticket" % self.appid
-        jsapi_ticket = self.get_cache_data(jsapi_ticket_key)
+        jsapi_ticket = self.cache.get(self.jsapi_ticket_key)
         if not jsapi_ticket:
-            print "init jsapi_ticket..."
+            logging.info("init jsapi_ticket...")
             jsapi_ticket = self.init_jsapi_ticket()
         return jsapi_ticket
 
     def init_jsapi_ticket(self):
         # 每日有调用次数上限，需要缓存结果
         result = self.get(ApiUrl.jsapi_ticket)
-        jsapi_ticket_key = "%s:jsapi_ticket" % self.appid
-        self.cache_data(jsapi_ticket_key, result["ticket"], result["expires_in"])
+        self.cache.set(self.jsapi_ticket_key, result["ticket"], result["expires_in"])
         return result["ticket"]
+
+    def delete_jsapi_ticket(self):
+        self.cache.delete(self.jsapi_ticket_key)
 
     def url_format(self, url):
         return url.format(appid=self.appid, appsecret=self.appsecret, 

@@ -56,10 +56,10 @@ def cipher_text_decorator(func):
 class MsgHandler(object):
     #回复微信消息的类
 
-    def __init__(self, wc, default="success", crypto=False):
+    def __init__(self, wp, default="success", crypto=False):
         # crypto 是否加密[False:明文(未加密) True:密文(已加密)]
         # 通过设置crypto可以动态改变加解密模式
-        self.wc = wc
+        self.wp = wp
         self.default = default
         self.crypto = crypto
         self.register_funcs = dict()
@@ -74,7 +74,7 @@ class MsgHandler(object):
         if value:
             # 密文通讯
             from ..wx_crypto.WXBizMsgCrypt import WXBizMsgCrypt
-            self.msgcrypt = WXBizMsgCrypt(self.wc.token, self.wc.aeskey, self.wc.appid)
+            self.msgcrypt = WXBizMsgCrypt(self.wp.token, self.wp.aeskey, self.wp.appid)
             self.response = cipher_text_decorator(self.response)
         else:
             # 明文通讯
@@ -92,11 +92,11 @@ class MsgHandler(object):
         msg_type = self.convert(msg_type)
         self.register_funcs[msg_type] = func
 
-    def response(self, msg_type, params):
+    def response(self, msg_type, xml_tree):
         # 回复微信消息
         try:
             msg_type = self.convert(msg_type)
-            return self.register_funcs[msg_type](params) or self.default
+            return self.register_funcs[msg_type](xml_tree) or self.default
         except KeyError as e:
             logging.error(str(e))
             return self.default
@@ -131,7 +131,7 @@ class MsgHandler(object):
             return self.response(self, xml, args)
         else:
             # 服务器接入验证
-            return self.auth(args, self.wc.token)
+            return self.auth(args, self.wp.token)
 
 
 class ReplyTemplate(object):
@@ -225,27 +225,27 @@ class ReplyTemplate(object):
 class MsgManager(object):
     # message manage 消息管理
 
-    def __init__(self, wc):
-        self.wc = wc
+    def __init__(self, wp):
+        self.wp = wp
 
     def add_account(self, kf_account, nickname, password):
         data = {"kf_account": kf_account, "nickname": nickname, "password": password}
-        return self.wc.post(ApiUrl.add_staff, data)
+        return self.wp.post(ApiUrl.add_staff, data)
 
     def update_account(self, kf_account, nickname, password):
         data = {"kf_account": kf_account, "nickname": nickname, "password": password}
-        return self.wc.post(ApiUrl.update_staff, data)
+        return self.wp.post(ApiUrl.update_staff, data)
 
     def delete_account(self, kf_account, nickname, password):
         data = {"kf_account": kf_account, "nickname": nickname, "password": password}
-        return self.wc.post(ApiUrl.delete_staff, data)
+        return self.wp.post(ApiUrl.delete_staff, data)
 
     def set_headimg(self, kf_account, headimg):
         url = ApiUrl.set_headimg % kf_account
-        return self.wc.upload(url, media=headimg)
+        return self.wp.upload(url, media=headimg)
 
     def get_account_list(self):
-        return self.wc.get(ApiUrl.get_kflist)
+        return self.wp.get(ApiUrl.get_kflist)
 
     def send_to_user(self, msg_type, touser, **kwargs):
         """发送消息给微信用户
@@ -258,7 +258,7 @@ class MsgManager(object):
         data = {"touser": touser, "msgtype": msgtype, msgtype: kwargs}
         if kf_account:
             data["customservice"] = {"kf_account": kf_account}
-        return self.wc.post(ApiUrl.send_msg, data)
+        return self.wp.post(ApiUrl.send_msg, data)
 
     def send_to_mass(self, msgtype, tousers, **kwargs):
         """批量发送消息给微信用户
@@ -268,7 +268,7 @@ class MsgManager(object):
         """
         self.validate_msgtype(msgtype)
         data = {"touser": tousers, "msgtype": msgtype, msgtype: kwargs}
-        return self.wc.post(ApiUrl.mass_send, data)
+        return self.wp.post(ApiUrl.mass_send, data)
 
     def send_to_group(self, msgtype, group_id, is_to_all, **kwargs):
         """发送消息给微信用户组
@@ -280,7 +280,7 @@ class MsgManager(object):
         self.validate_msgtype(msgtype)
         data = {"filter": {"is_to_all": is_to_all, "group_id": group_id}, "msgtype": msgtype, 
         msgtype: kwargs}
-        return self.wc.post(ApiUrl.group_send, data)
+        return self.wp.post(ApiUrl.group_send, data)
 
     def send_to_preview(self, msgtype, touser, **kwargs):
         """消息预览接口, 每日限制100次
@@ -290,13 +290,13 @@ class MsgManager(object):
         """
         self.validate_msgtype(msgtype)
         data = {"touser": touser, "msgtype": msgtype, msgtype: kwargs}
-        return self.wc.post(ApiUrl.preview_send, data)
+        return self.wp.post(ApiUrl.preview_send, data)
 
     def get_msg_status(self, msg_id):
         """获取群发消息的状态
         @param msg_id: 群发接口返回的msg_id
         """
-        return self.wc.post(ApiUrl.msg_status, {"msg_id": msg_id})
+        return self.wp.post(ApiUrl.msg_status, {"msg_id": msg_id})
 
     def validate_msgtype(self, msgtype):
         if msgtype not in ("text", "image", "voice", "video", "musci", "news", "mpnews", "wxcard"):

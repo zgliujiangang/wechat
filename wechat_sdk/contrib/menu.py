@@ -186,23 +186,23 @@ class MainButtonGroup(ButtonBase):
 class MenuManager(object):
     # menu manage 菜单管理
 
-    def __init__(self, wc):
-        self.wc = wc
+    def __init__(self, wp):
+        self.wp = wp
 
     def create(self, data):
         # 自定义菜单创建
         if isinstance(data, MainButtonGroup):
             data = data.data
-        return self.wc.post(ApiUrl.create_menu, data=data)
+        return self.wp.post(ApiUrl.create_menu, data=data)
 
     def get(self):
         # 自定义菜单查询
-        return self.wc.get(ApiUrl.get_menu)
+        return self.wp.get(ApiUrl.get_menu)
 
     def get_current(self):
         # 公众号当前菜单配置
-        return self.wc.get(ApiUrl.get_current_menu)
+        return self.wp.get(ApiUrl.get_current_menu)
 
     def delete(self):
         # 自定义菜单删除
-        return self.wc.get(ApiUrl.delete_menu)
+        return self.wp.get(ApiUrl.delete_menu)

@@ -3,14 +3,14 @@
 
 import sys; sys.path.append("..")
 import time
-from examples.base_test import wc
+from examples.base_test import wechat_app
 from wechat_sdk.contrib.msg import MsgHandler, ReplyTemplate
 
 
 # 明文模式
-msg_handler = MsgHandler(wc, default="Hello World")
+msg_handler = MsgHandler(wechat_app, default="Hello World")
 # 密文模式
-# msg_handler = MsgHandler(wc, default="Hello World", crypto=True)
+# msg_handler = MsgHandler(wechat_app, default="Hello World", crypto=True)
 
 
 # router方法接受一个二元元祖，第一个参数对应xml中的msg_type,第二个参数对应event,如果没有event,则传空字符串
@@ -58,12 +58,12 @@ if __name__ == '__main__':
 # @app.route("/msg/callback/")
 # def msg_callback():
 #     if request.method = 'get':
-#         return reply(request.args, auth=True)
+#         return msg_handler(request.args, auth=True)
 #     else:
 #         # 明文
-#         return reply(request.data)
+#         return msg_handler(request.data)
 #         # 密文
-#         # return reply(request.data, request.args)
+#         # return msg_handler(request.data, request.args)
 
 # if __name__ == "__main__":
 #     app.run(debug=True)
