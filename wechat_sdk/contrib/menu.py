@@ -183,7 +183,8 @@ class MainButtonGroup(ButtonBase):
         return {"button": [button.data for button in self.button_list]}
 
 
-class Manager(object):
+class MenuManager(object):
+    # menu manage 菜单管理
 
     def __init__(self, wc):
         self.wc = wc
@@ -197,6 +198,10 @@ class Manager(object):
     def get(self):
         # 自定义菜单查询
         return self.wc.get(ApiUrl.get_menu)
+
+    def get_current(self):
+        # 公众号当前菜单配置
+        return self.wc.get(ApiUrl.get_current_menu)
 
     def delete(self):
         # 自定义菜单删除

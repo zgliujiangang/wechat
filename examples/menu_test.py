@@ -4,11 +4,11 @@
 import sys; sys.path.append("..")
 from examples.base_test import wc
 from wechat_sdk.contrib.menu import mediaButton, clickButton, \
-viewButton, SubButtonGroup, MainButtonGroup, Manager
+viewButton, SubButtonGroup, MainButtonGroup, MenuManager
 
 
 def test():
-    menu_manager = Manager(wc)
+    menu_manager = MenuManager(wc)
     click1 = clickButton(name="点击1", key="1111")
     click2 = clickButton(name="点击2", key='2222')
     click3 = clickButton(name="点击3", key="333")

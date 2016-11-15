@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# 微信消息处理
+# 消息管理
 
 
 import logging
@@ -10,6 +10,7 @@ try:
 except ImportError:
     import xml.etree.ElementTree as ET
 from ..utils.common import random_str
+from ..urls import ApiUrl
 
 
 def clear_text_decorator(func):
@@ -219,3 +220,38 @@ class ReplyTemplate(object):
                 </Articles>
             </xml> 
             """
+
+
+class CSAManager(object):
+    # customer service account manage 客服账号管理
+    
+    def __init__(self, wc):
+        self.wc = wc
+
+    def add_account(self, kf_account=None, nickname=None, password=None):
+        data = {"kf_account": kf_account, "nickname": nickname, "password": password}
+        return self.wc.post(ApiUrl.add_staff, data)
+
+    def update_account(self, kf_account=None, nickname=None, password=None):
+        data = {"kf_account": kf_account, "nickname": nickname, "password": password}
+        return self.wc.post(ApiUrl.update_staff, data)
+
+    def delete_account(self, kf_account=None, nickname=None, password=None):
+        data = {"kf_account": kf_account, "nickname": nickname, "password": password}
+        return self.wc.post(ApiUrl.delete_staff, data)
+
+    def set_headimg(self, kf_account=None, headimg=None):
+        url = ApiUrl.set_headimg % kf_account
+        return self.wc.upload(url, headimg=headimg)
+
+    def get_account_list(self):
+        return self.wc.get(ApiUrl.get_kflist)
+
+    def send_msg(self, msg_type, touser, **kwargs):
+        if msgtype not in ("text", "image", "voice", "video", "musci", "news", "mpnews", "wxcard"):
+            raise ValueError("invalid msg type: %s" % msgtype)
+        kf_account = kwargs.pop("kf_account", None)
+        data = {"touser": touser, "msgtype": msgtype, msgtype: kwargs}
+        if kf_account:
+            data["customservice"] = {"kf_account": kf_account}
+        return self.wx.post(ApiUrl.send_msg, data)

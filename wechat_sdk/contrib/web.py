@@ -1,15 +1,12 @@
 # -*- coding: utf-8 -*-
-# oauth2.0认证
+# 微信网页开发
 
 
 from urllib import quote
 from ..urls import ApiUrl
 
 
-#网页授权必须配置授权回调域名
-#网页授权的access_token与获取基础信息的access_token不是同一个东西
-
-class Scope(object):
+class Scope:
     base = "snsapi_base"
     userinfo = "snsapi_userinfo"
 

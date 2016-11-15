@@ -171,8 +171,3 @@ class WechatClient(object):
         signature = hashlib.sha1(params_string).hexdigest()
         return dict(appId=self.appid, timestamp=timestamp, nonceStr=noncestr, signature=signature)
 
-    def patch(self, menu=False):
-        if menu:
-            from .contrib import menu
-            menu.create = partial(menu.create, self)
-
