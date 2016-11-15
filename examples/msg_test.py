@@ -23,7 +23,7 @@ def text(xml_tree):
 
 # 图片消息
 @msg_handler.route(("image", ""))
-def text(xml_tree):
+def image(xml_tree):
     return ReplyTemplate.TEXT % (xml_tree.find("FromUserName").text, xml_tree.find("ToUserName").text, \
         int(time.time()), xml_tree.find("MediaId").text)
 

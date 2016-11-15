@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-
+import json
 import sys; sys.path.append("..")
 from examples.base_test import wechat_app
 from wechat_sdk.contrib.menu import mediaButton, clickButton, \
@@ -22,7 +22,11 @@ def test():
 
     # 传入一个MainButtonGroup的实例是允许的，否则的话自己构造菜单传入
     # print menu_manager.create(test_menu)
-    print menu_manager.get()
+    menu = menu_manager.get()
+    print menu
+    current_menu = menu_manager.get_current()
+    print current_menu
+
 
 if __name__ == '__main__':
     test()
