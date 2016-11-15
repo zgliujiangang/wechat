@@ -21,6 +21,13 @@ def text(xml_tree):
     	int(time.time()), xml_tree.find("Content").text)
 
 
+# 图片消息
+@msg_handler.route(("image", ""))
+def text(xml_tree):
+    return ReplyTemplate.TEXT % (xml_tree.find("FromUserName").text, xml_tree.find("ToUserName").text, \
+        int(time.time()), xml_tree.find("MediaId").text)
+
+
 # 点击事件消息
 @msg_handler.route(("event", "click"))
 def click(xml_tree):
@@ -51,19 +58,14 @@ if __name__ == '__main__':
 
 
 # Flask示例
-# from flask import Flask
+# from flask import Flask, request
 
 # app = Flask(__name__)
 
 # @app.route("/msg/callback/")
 # def msg_callback():
-#     if request.method = 'get':
-#         return msg_handler(request.args, auth=True)
-#     else:
-#         # 明文
-#         return msg_handler(request.data)
-#         # 密文
-#         # return msg_handler(request.data, request.args)
+#     auth = request.method.lower() == "get"
+#     msg_handler(request.data, request.args, auth)
 
 # if __name__ == "__main__":
 #     app.run(debug=True)
