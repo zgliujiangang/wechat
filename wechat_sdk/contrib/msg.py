@@ -250,7 +250,7 @@ class MsgManager(object):
     def send_to_user(self, msg_type, touser, **kwargs):
         """发送消息给微信用户
         @param msgtype: 消息类型
-        @param touser: 用户的opend_id
+        @param touser: 用户的open_id
         @param kwargs: 具体的消息参数
         """
         self.validate_msgtype(msgtype)
@@ -263,7 +263,7 @@ class MsgManager(object):
     def send_to_mass(self, msgtype, tousers, **kwargs):
         """批量发送消息给微信用户
         @param msgtype: 消息类型
-        @param tousers: 用户的opend_id组成的list["openid1", "openid2", ...]
+        @param tousers: 用户的open_id组成的list["openid1", "openid2", ...]
         @param kwargs: 具体的消息参数
         """
         self.validate_msgtype(msgtype)
@@ -285,7 +285,7 @@ class MsgManager(object):
     def send_to_preview(self, msgtype, touser, **kwargs):
         """消息预览接口, 每日限制100次
         @param msgtype: 消息类型
-        @param touser: 用户的opend_id
+        @param touser: 用户的open_id
         @param kwargs: 具体的消息参数
         """
         self.validate_msgtype(msgtype)
