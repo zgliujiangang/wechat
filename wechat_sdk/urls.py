@@ -19,18 +19,25 @@ class ApiUrl:
     update_staff = "https://api.weixin.qq.com/customservice/kfaccount/update?access_token={access_token}"
     delete_staff = "https://api.weixin.qq.com/customservice/kfaccount/del?access_token={access_token}"
     set_headimg = "http://api.weixin.qq.com/customservice/kfaccount/uploadheadimg?access_token={access_token}&kf_account=%s"
-    get_kflist = "https://api.weixin.qq.com/cgi-bin/customservice/getkflist?access_token={access_token}"
+    get_kflist = "https://api.weixin.qq.com/cgi-bin/customservice/getkflist?access_token?appid={access_token}"
     send_msg = "https://api.weixin.qq.com/cgi-bin/message/custom/send?access_token={access_token}"
     group_send = "https://api.weixin.qq.com/cgi-bin/message/mass/sendall?access_token={access_token}"
     mass_send = "https://api.weixin.qq.com/cgi-bin/message/mass/send?access_token={access_token}"
     preview_send = "https://api.weixin.qq.com/cgi-bin/message/mass/preview?access_token={access_token}"
     msg_status = "https://api.weixin.qq.com/cgi-bin/message/mass/get?access_token={access_token}"
+    set_industry = "https://api.weixin.qq.com/cgi-bin/template/api_set_industry?access_token={access_token}"
+    get_industry = "https://api.weixin.qq.com/cgi-bin/template/get_industry?access_token={access_token}"
+    add_template = "https://api.weixin.qq.com/cgi-bin/template/api_add_template?access_token={access_token}"
+    get_template = "https://api.weixin.qq.com/cgi-bin/template/get_all_private_template?access_token={access_token}"
+    delete_template = "https://api,weixin.qq.com/cgi-bin/template/del_private_template?access_token={access_token}"
+    send_template_msg = "https://api.weixin.qq.com/cgi-bin/message/template/send?access_token={access_token}"
+    get_autoreply_info = "https://api.weixin.qq.com/cgi-bin/get_current_autoreply_info?access_token={access_token}"
 
     # 微信网页授权
     oauth2_token = "https://api.weixin.qq.com/sns/oauth2/access_token?appid={appid}&secret={appsecret}&code=%s&grant_type=authorization_code"
     oauth2_userinfo = "https://api.weixin.qq.com/sns/userinfo?access_token=%s&openid=%s&lang=zh_CN"
     oauth2_refresh = "https://api.weixin.qq.com/sns/oauth2/refresh_token?appid={appid}&grant_type=refresh_token&refresh_token=%s"
-    oauth2_check = "https://api.weixin.qq.com/sns/auth?access_token=%s&openid=%s"
+    oauth2_auth_token = "https://api.weixin.qq.com/sns/auth?access_token=%s&openid=%s"
 
     # 素材管理模块
     # 临时素材

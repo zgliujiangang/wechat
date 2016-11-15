@@ -1,20 +1,15 @@
 # -*- coding: utf-8 -*-
 
 
-import os
-import time
 import json
 import requests
 import urllib2
-import hashlib
 import logging
-from functools import partial
 from poster.encode import multipart_encode
 from poster.streaminghttp import register_openers
 from .urls import ApiUrl
 from .error import ErrorHandler
 from .utils.cache import BaseCache, PickleCache
-from .utils.common import random_str
 
 
 class WechatApp(object):
@@ -144,15 +139,4 @@ class WechatApp(object):
             logging.info("maybe download file successfully")
             # resp可以用StringIO.StringIO(resp)处理
             return {"type": "buffer", "result": resp}
-
-    def jsconf(self, url):
-        # web网页进行js conf注入时所需参数
-        noncestr = random_str()
-        timestamp = int(time.time())
-        params = dict(noncestr=noncestr, url=url, timestamp=timestamp, jsapi_ticket=self.jsapi_ticket)
-        items = params.items()
-        items.sort(key=lambda x: x[0])
-        params_string = '&'.join(['%s=%s' % item for item in items])
-        signature = hashlib.sha1(params_string).hexdigest()
-        return dict(appId=self.appid, timestamp=timestamp, nonceStr=noncestr, signature=signature)
 
