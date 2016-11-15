@@ -222,36 +222,83 @@ class ReplyTemplate(object):
             """
 
 
-class CSAManager(object):
-    # customer service account manage 客服账号管理
-    
+class MsgManager(object):
+    # message manage 消息管理
+
     def __init__(self, wc):
         self.wc = wc
 
-    def add_account(self, kf_account=None, nickname=None, password=None):
+    def add_account(self, kf_account, nickname, password):
         data = {"kf_account": kf_account, "nickname": nickname, "password": password}
         return self.wc.post(ApiUrl.add_staff, data)
 
-    def update_account(self, kf_account=None, nickname=None, password=None):
+    def update_account(self, kf_account, nickname, password):
         data = {"kf_account": kf_account, "nickname": nickname, "password": password}
         return self.wc.post(ApiUrl.update_staff, data)
 
-    def delete_account(self, kf_account=None, nickname=None, password=None):
+    def delete_account(self, kf_account, nickname, password):
         data = {"kf_account": kf_account, "nickname": nickname, "password": password}
         return self.wc.post(ApiUrl.delete_staff, data)
 
-    def set_headimg(self, kf_account=None, headimg=None):
+    def set_headimg(self, kf_account, headimg):
         url = ApiUrl.set_headimg % kf_account
-        return self.wc.upload(url, headimg=headimg)
+        return self.wc.upload(url, media=headimg)
 
     def get_account_list(self):
         return self.wc.get(ApiUrl.get_kflist)
 
-    def send_msg(self, msg_type, touser, **kwargs):
-        if msgtype not in ("text", "image", "voice", "video", "musci", "news", "mpnews", "wxcard"):
-            raise ValueError("invalid msg type: %s" % msgtype)
+    def send_to_user(self, msg_type, touser, **kwargs):
+        """发送消息给微信用户
+        @param msgtype: 消息类型
+        @param touser: 用户的opend_id
+        @param kwargs: 具体的消息参数
+        """
+        self.validate_msgtype(msgtype)
         kf_account = kwargs.pop("kf_account", None)
         data = {"touser": touser, "msgtype": msgtype, msgtype: kwargs}
         if kf_account:
             data["customservice"] = {"kf_account": kf_account}
-        return self.wx.post(ApiUrl.send_msg, data)
+        return self.wc.post(ApiUrl.send_msg, data)
+
+    def send_to_mass(self, msgtype, tousers, **kwargs):
+        """批量发送消息给微信用户
+        @param msgtype: 消息类型
+        @param tousers: 用户的opend_id组成的list["openid1", "openid2", ...]
+        @param kwargs: 具体的消息参数
+        """
+        self.validate_msgtype(msgtype)
+        data = {"touser": tousers, "msgtype": msgtype, msgtype: kwargs}
+        return self.wc.post(ApiUrl.mass_send, data)
+
+    def send_to_group(self, msgtype, group_id, is_to_all, **kwargs):
+        """发送消息给微信用户组
+        @param msgtype: 消息类型
+        @param group_id: 用户组ID
+        @param is_to_all: 是否加入历史消息(True or False)
+        @param kwargs: 具体的消息参数
+        """
+        self.validate_msgtype(msgtype)
+        data = {"filter": {"is_to_all": is_to_all, "group_id": group_id}, "msgtype": msgtype, 
+        msgtype: kwargs}
+        return self.wc.post(ApiUrl.group_send, data)
+
+    def send_to_preview(self, msgtype, touser, **kwargs):
+        """消息预览接口, 每日限制100次
+        @param msgtype: 消息类型
+        @param touser: 用户的opend_id
+        @param kwargs: 具体的消息参数
+        """
+        self.validate_msgtype(msgtype)
+        data = {"touser": touser, "msgtype": msgtype, msgtype: kwargs}
+        return self.wc.post(ApiUrl.preview_send, data)
+
+    def get_msg_status(self, msg_id):
+        """获取群发消息的状态
+        @param msg_id: 群发接口返回的msg_id
+        """
+        return self.wc.post(ApiUrl.msg_status, {"msg_id": msg_id})
+
+    def validate_msgtype(self, msgtype):
+        if msgtype not in ("text", "image", "voice", "video", "musci", "news", "mpnews", "wxcard"):
+            raise ValueError("invalid msg type: %s" % msgtype)
+

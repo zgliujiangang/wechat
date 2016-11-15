@@ -21,6 +21,10 @@ class ApiUrl:
     set_headimg = "http://api.weixin.qq.com/customservice/kfaccount/uploadheadimg?access_token={access_token}&kf_account=%s"
     get_kflist = "https://api.weixin.qq.com/cgi-bin/customservice/getkflist?access_token={access_token}"
     send_msg = "https://api.weixin.qq.com/cgi-bin/message/custom/send?access_token={access_token}"
+    group_send = "https://api.weixin.qq.com/cgi-bin/message/mass/sendall?access_token={access_token}"
+    mass_send = "https://api.weixin.qq.com/cgi-bin/message/mass/send?access_token={access_token}"
+    preview_send = "https://api.weixin.qq.com/cgi-bin/message/mass/preview?access_token={access_token}"
+    msg_status = "https://api.weixin.qq.com/cgi-bin/message/mass/get?access_token={access_token}"
 
     # 微信网页授权
     oauth2_token = "https://api.weixin.qq.com/sns/oauth2/access_token?appid={appid}&secret={appsecret}&code=%s&grant_type=authorization_code"
