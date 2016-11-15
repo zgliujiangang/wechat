@@ -1,18 +1,18 @@
 # -*- coding: utf-8 -*-
 
 
+import os
+import time
 try:
     import cPickle as pickle
 except ImportError:
     import pickle
-import os
-import time
 
 
 class BaseCache(object):
     # 缓存的基类
 
-    def set(self, key, value, expire_in=None):
+    def set(self, key, value, expires_in=None):
         return NotImplemented
 
     def get(self, key):
@@ -25,10 +25,10 @@ class BaseCache(object):
 class PickleCacheData:
     # 序列化缓存数据类
 
-    def __init__(self, key, value, expire_in=None):
+    def __init__(self, key, value, expires_in=None):
         self._key = key
         self._value = value
-        self._expire_in = expire_in
+        self._expires_in = expires_in
         self.create_time = time.time()
 
     @property
@@ -37,9 +37,9 @@ class PickleCacheData:
 
     @property
     def value(self):
-        if self._expire_in is None:
+        if self._expires_in is None:
             return self._value
-        elif time.time() >= self.create_time + self._expire_in - 30:
+        elif time.time() >= self.create_time + self._expires_in - 30:
             return None
         else:
             return self._value
@@ -53,8 +53,8 @@ class PickleCache(BaseCache):
         assert os.path.isdir(cache_dir), "cache_dir:%s必须是一个有效的目录" % cache_dir
         self.cache_dir = cache_dir
 
-    def set(self, key, value, expire_in=None):
-        data = PickleCacheData(key, value, expire_in)
+    def set(self, key, value, expires_in=None):
+        data = PickleCacheData(key, value, expires_in)
         cache_file = os.path.join(self.cache_dir, data.key)
         with open(cache_file, "w") as f:
             pickle.dump(data, f)
