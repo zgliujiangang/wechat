@@ -229,6 +229,8 @@ class MsgManager(object):
         self.wp = wp
 
     def add_account(self, kf_account, nickname, password):
+        """注意，2016年7月1日起客服功能已改版，相关接口已失效
+        """
         data = {"kf_account": kf_account, "nickname": nickname, "password": password}
         return self.wp.post(ApiUrl.add_staff, data)
 
@@ -297,6 +299,48 @@ class MsgManager(object):
         @param msg_id: 群发接口返回的msg_id
         """
         return self.wp.post(ApiUrl.msg_status, {"msg_id": msg_id})
+
+    def set_industry(self, industry_id1, industry_id2):
+        """设置所属行业
+        @param industry_id1: 公众号模板消息所属行业编号
+        @param industry_id2: 公众号模板消息所属行业编号
+        """
+        return self.wp.post(ApiUrl.set_industry, {"industry_id1": industry_id1, 
+            "industry_id2": industry_id2})
+
+    def get_industry(self):
+        # 获取账号设置的行业信息
+        return self.wp.get(ApiUrl.get_industry)
+
+    def add_template(self, template_id_short):
+        """添加模板ID
+        @param template_id_short: 模板库中模板的编号
+        """
+        return self.wp.post(ApiUrl.add_template, {"template_id_short": template_id_short})
+
+    def get_all_template(self):
+        # 获取账号下所有模板ID
+        return self.wp.get(ApiUrl.get_template)
+
+    def delete_template(self, template_id):
+        """删除账号下的模板
+        @param template_id: 模板ID
+        """
+        return self.wp.post(ApiUrl.delete_template, {"template_id": template_id})
+
+    def send_template_msg(self, touser, template_id, url, template_data):
+        """发送模板消息
+        @param touser: 微信用户open_id
+        @param template_id: 模板ID
+        @param url: 超链接
+        @param template_data: 渲染模板的数据
+        """
+        data = {"touser": touser, "template_id": template_id, "url": url, "data": template_data}
+        return self.wp.post(ApiUrl.send_template_msg, data)
+
+    def get_autoreply_info(self):
+        # 获取当前公众号的自动回复规则
+        return self.wp.get(ApiUrl.get_autoreply_info)
 
     def validate_msgtype(self, msgtype):
         if msgtype not in ("text", "image", "voice", "video", "musci", "news", "mpnews", "wxcard"):

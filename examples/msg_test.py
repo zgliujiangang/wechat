@@ -4,11 +4,12 @@
 import sys; sys.path.append("..")
 import time
 from examples.base_test import wechat_app
-from wechat_sdk.contrib.msg import MsgHandler, ReplyTemplate
+from wechat_sdk.contrib.msg import MsgHandler, ReplyTemplate, MsgManager
 
 
 # 明文模式
 msg_handler = MsgHandler(wechat_app, default="Hello World")
+msg_manager = MsgManager(wechat_app)
 # 密文模式
 # msg_handler = MsgHandler(wechat_app, default="Hello World", crypto=True)
 
@@ -55,6 +56,7 @@ if __name__ == '__main__':
             """
     print msg_handler(ReplyTemplate.VIDEO)
     print msg_handler(TEXT)
+    print msg_manager.get_industry()
 
 
 # Flask示例

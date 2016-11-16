@@ -129,6 +129,7 @@ class ErrorHandler(object):
     "65314": "不合法的城市信息",
     "65316": "该公众号的菜单设置了过多的域名外跳（最多跳转到3个域名的链接）",
     "65317": "不合法的URL",
+    "65400": "客服功能已改版，详情请访问https://mp.weixin.qq.com/cgi-bin/announce?action=getannouncement&key=1464266075&version=12&lang=zh_CN",
     "9001001": "POST数据参数不合法",
     "9001002": "远端服务不可用",
     "9001003": "Ticket不合法",
