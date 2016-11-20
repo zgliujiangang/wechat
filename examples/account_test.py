@@ -7,10 +7,10 @@ from wechat_sdk.contrib.account import AccountManager
 
 
 def account_test():
-	account_manager = AccountManager(wechat_app)
-	result = account_manager.get_shorturl("http://www.baidu.con")
-	print result
+    account_manager = AccountManager(wechat_app)
+    result = account_manager.get_shorturl("http://www.baidu.con")
+    print result
 
 
 if __name__ == '__main__':
-	account_test()
+    account_test()
