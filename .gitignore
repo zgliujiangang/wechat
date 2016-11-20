@@ -2,3 +2,6 @@
 *:access_token
 *:jsapi_ticket
 cache_dir/
+build/
+dist/
+wechat_sdk.egg-info/
