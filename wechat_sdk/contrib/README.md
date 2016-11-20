@@ -4,7 +4,7 @@
         
 ###### 消息管理:[msg.py](https://github.com/zgliujiangang/wechat/blob/master/wechat_sdk/contrib/msg.py)
 
-###### 微信网页开发:[web.py](https://github.com/zgliujiangang/wechat/blob/master/wechat_sdk/contrib/msg.py)
+###### 微信网页开发:[web.py](https://github.com/zgliujiangang/wechat/blob/master/wechat_sdk/contrib/web.py)
 
 ###### 素材管理:[media.py](https://github.com/zgliujiangang/wechat/blob/master/wechat_sdk/contrib/media.py)
 
