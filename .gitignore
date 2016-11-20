@@ -1,3 +1,4 @@
 *.py[cod]
 *:access_token
 *:jsapi_ticket
+cache_dir/
