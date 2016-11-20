@@ -17,12 +17,12 @@ print wechat_app.access_token
 print wechat_app.jsapi_ticket
 ```
 	目前sdk实现了公众号以下六大模块的功能，基本能满足一般需求:
-	1、[自定义菜单]|(/wechat_sdk/contrib/menu.py)
-	2、[消息管理]|(/wechat_sdk/contrib/msg.py)
-	3、[微信网页开发]|(/wechat_sdk/contrib/web.py)
-	4、[素材管理]|(/wechat_sdk/contrib/media.py)
-	5、[用户管理]|(/wechat_sdk/contrib/user.py)
-	6、[账号管理]|(/wechat_sdk/contrib/account.py)
+	1 [自定义菜单]|(/wechat_sdk/contrib/menu.py)
+	2 [消息管理]|(/wechat_sdk/contrib/msg.py)
+	3 [微信网页开发]|(/wechat_sdk/contrib/web.py)
+	4 [素材管理]|(/wechat_sdk/contrib/media.py)
+	5 [用户管理]|(/wechat_sdk/contrib/user.py)
+	6 [账号管理]|(/wechat_sdk/contrib/account.py)
 
 	微信各模块使用教程请参考[examples](/examples/)
 ##### 卸载
