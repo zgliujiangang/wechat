@@ -5,11 +5,20 @@ import json
 import requests
 import urllib2
 import logging
+import functools
 from poster.encode import multipart_encode
 from poster.streaminghttp import register_openers
 from .urls import ApiUrl
 from .error import ErrorHandler
 from .utils.cache import BaseCache, PickleCache
+
+
+def url_format_wrap(fn):
+    @functools.wraps(fn)
+    def wrap(wp, url, *args, **kwargs):
+        url = wp.url_format(url)
+        return fn(wp, url, *args, **kwargs)
+    return wrap
 
 
 class WechatApp(object):
@@ -90,8 +99,8 @@ class WechatApp(object):
         return url.format(appid=self.appid, appsecret=self.appsecret, 
                             token=self.token, access_token=self.access_token)
 
+    @url_format_wrap
     def get(self, url, params=None):
-        url = self.url_format(url)
         resp = requests.get(url, params)
         result = json.loads(resp.text)
         errcode = result.get("errcode")
@@ -99,9 +108,9 @@ class WechatApp(object):
             self.err_handler.dispatch_error(errcode)
         return result
 
+    @url_format_wrap
     def post(self, url, data=None):
         # data为字典，后面会json转换的
-        url = self.url_format(url)
         # 传含有中文字符的json串时需要进行ensure_ascii处理
         data = json.dumps(data, ensure_ascii=False)
         resp = requests.post(url, data=data)
@@ -111,10 +120,10 @@ class WechatApp(object):
             self.err_handler.dispatch_error(errcode)
         return result
 
+    @url_format_wrap
     def upload(self, url, **file_form):
         # 文件上传，如果有open操作，请在with上下文环境中执行
         register_openers()
-        url = self.url_format(url)
         datagen, headers = multipart_encode(file_form)
         request = urllib2.Request(url, datagen, headers)
         result = json.loads(urllib2.urlopen(request).read())
@@ -123,9 +132,9 @@ class WechatApp(object):
             self.err_handler.dispatch_error(errcode)
         return result
 
+    @url_format_wrap
     def download(self, url, data=None):
         # 文件下载，返回buffer, 也有可能返回json串
-        url = self.url_format(url)
         resp = urllib2.urlopen(url, data=json.dumps(data)).read()
         try:
             result = json.loads(resp)
@@ -133,10 +142,10 @@ class WechatApp(object):
             if errcode and str(errcode) != "0":
                 self.err_handler.dispatch_error(errcode)
             # 有的素材会返回media_id所以能被json解析不代表未返回素材
-            return {"type": "json", "result": result}
+            return {"type": "json", "json": result}
         except Exception as e:
             logging.error(str(e))
             logging.info("maybe download file successfully")
             # resp可以用StringIO.StringIO(resp)处理
-            return {"type": "buffer", "result": resp}
+            return {"type": "buffer", "buffer": resp}
 

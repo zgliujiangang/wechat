@@ -40,19 +40,15 @@ class ApiUrl:
     oauth2_auth_token = "https://api.weixin.qq.com/sns/auth?access_token=%s&openid=%s"
 
     # 素材管理模块
-    # 临时素材
-    media_upload = "https://api.weixin.qq.com/cgi-bin/media/upload?access_token={access_token}&type=%s"
-    media_download = "https://api.weixin.qq.com/cgi-bin/media/get?access_token={access_token}&media_id=%s"
-    # 永久素材
-    _media_upload = "https://api.weixin.qq.com/cgi-bin/material/add_material?access_token={access_token}&type=%s"
-    _media_download = "https://api.weixin.qq.com/cgi-bin/material/get_material?access_token={access_token}"
-    add_news = "https://api.weixin.qq.com/cgi-bin/material/add_news?access_token={access_token}"
-    add_news_image = "https://api.weixin.qq.com/cgi-bin/media/uploadimg?access_token={access_token}"
-    _media_delete = "https://api.weixin.qq.com/cgi-bin/material/del_material?access_token={access_token}"
+    upload_temp_media = "https://api.weixin.qq.com/cgi-bin/media/upload?access_token={access_token}&type=%s"
+    download_temp_media = "https://api.weixin.qq.com/cgi-bin/media/get?access_token={access_token}&media_id=%s"
+    upload_perm_media = "https://api.weixin.qq.com/cgi-bin/material/add_material?access_token={access_token}&type=%s"
+    download_perm_media = "https://api.weixin.qq.com/cgi-bin/material/get_material?access_token={access_token}"
+    delete_perm_media = "https://api.weixin.qq.com/cgi-bin/material/del_material?access_token={access_token}"
     update_news = "https://api.weixin.qq.com/cgi-bin/material/update_news?access_token={access_token}"
-    _media_count = "https://api.weixin.qq.com/cgi-bin/material/get_materialcount?access_token={access_token}"
-    _media_list = "https://api.weixin.qq.com/cgi-bin/material/batchget_material?access_token={access_token}"
-
+    add_news = "https://api.weixin.qq.com/cgi-bin/material/add_news?access_token={access_token}"
+    media_count = "https://api.weixin.qq.com/cgi-bin/material/get_materialcount?access_token={access_token}"
+    media_list = "https://api.weixin.qq.com/cgi-bin/material/batchget_material?access_token={access_token}"
 
     #用户管理模块
     create_group = "https://api.weixin.qq.com/cgi-bin/groups/create?access_token={access_token}"
