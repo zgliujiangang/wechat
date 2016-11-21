@@ -7,12 +7,13 @@
 ##### 使用
 	获取公众号的access_token和jsapi_ticket:
 ```python
+# -*- coding: utf-8 -*-
 from wechat_sdk import WechatApp
 
 appid = "wxa8e2f9be2c6f347c"
 appsecret = "0ed8890e310546b8ef45e1db174b2145"
 cache_dir = "/home/user/cache_dir" # cache_dir是一个系统目录用于存放缓存数据
-wechat_app = WechatApp(appid, appsecret, cache_dir)
+wechat_app = WechatApp(appid, appsecret, cache_dir=cache_dir)
 print wechat_app.access_token
 print wechat_app.jsapi_ticket
 ```
