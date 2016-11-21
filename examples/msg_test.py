@@ -8,7 +8,7 @@ from wechat_sdk.contrib.msg import MsgHandler, ReplyTemplate, MsgManager
 
 
 # 明文模式
-msg_handler = MsgHandler(wechat_app, default="Hello World")
+msg_handler = MsgHandler(wechat_app, default="我是默认回复，当没有注册事件处理方法时，就用我来回复！")
 msg_manager = MsgManager(wechat_app)
 # 密文模式
 # msg_handler = MsgHandler(wechat_app, default="Hello World", crypto=True)
@@ -18,8 +18,10 @@ msg_manager = MsgManager(wechat_app)
 # 文本消息
 @msg_handler.route(("text", ""))
 def text(xml_tree):
+    # content = xml_tree.find("Content").text
+    content = "收到了一个文本消息，由我自定义回复的内容，不局限于文本消息！"
     return ReplyTemplate.TEXT % (xml_tree.find("FromUserName").text, xml_tree.find("ToUserName").text, \
-    	int(time.time()), xml_tree.find("Content").text)
+    	int(time.time()), content)
 
 
 # 图片消息
@@ -51,12 +53,12 @@ if __name__ == '__main__':
                 <FromUserName><![CDATA[222222]]></FromUserName>
                 <CreateTime>111111111111</CreateTime>
                 <MsgType><![CDATA[text]]></MsgType>
-                <Content><![CDATA[hello world!]]></Content>
+                <Content><![CDATA[a msg handler test]]></Content>
             </xml>
             """
     print msg_handler(ReplyTemplate.VIDEO)
     print msg_handler(TEXT)
-    print msg_manager.get_industry()
+    # print msg_manager.get_industry()
 
 
 # Flask示例

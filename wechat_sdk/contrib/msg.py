@@ -2,9 +2,10 @@
 # 消息管理
 
 
+import time
 import logging
 import hashlib
-from functools import wraps
+from functools import wraps, partial
 try:
     import xml.etree.cElementTree as ET
 except ImportError:
@@ -13,44 +14,17 @@ from ..utils.common import random_str
 from ..urls import ApiUrl
 
 
-def clear_text_decorator(func):
-    # 明文模式装饰器
-    @wraps(func)
-    def decorator(msg_handler, xml, args):
-        xml_tree = ET.fromstring(xml)
-        try:
-            msg_type = xml_tree.find("MsgType").text
-        except AttributeError:
-            msg_type = ""
-        try:
-            event = xml_tree.find("Event").text
-        except AttributeError:
-            event = ""
-        response = func((msg_type, event), xml_tree)
-        return response
-    return decorator
-
-
-def cipher_text_decorator(func):
+def cipher_decorator(fn, msg_handler):
     # 密文模式装饰器
-    @wraps(func)
-    def decorator(msg_handler, xml, args):
-        de_ret, xml = msg_handler.msgcrypt.DecryptMsg(xml, args.get("msg_signature"), 
+    @wraps(fn)
+    def decorator(self, xml, args):
+        de_ret, xml = self.msgcrypt.DecryptMsg(xml, args.get("msg_signature"), 
             args.get("timestamp"), args.get("nonce"))
-        xml_tree = ET.fromstring(xml)
-        try:
-            msg_type = xml_tree.find("MsgType").text
-        except AttributeError:
-            msg_type = ""
-        try:
-            event = xml_tree.find("Event").text
-        except AttributeError:
-            event = ""
-        response = func((msg_type, event), xml_tree)
+        response = fn(xml, args)
         nonce = random_str(min_length=10, max_length=10)
-        en_ret, response = msg_handler.msgcrypt.EncryptMsg(response, nonce)
+        en_ret, response = self.msgcrypt.EncryptMsg(response, nonce)
         return response
-    return decorator
+    return partial(decorator, msg_handler)
 
 
 class MsgHandler(object):
@@ -58,7 +32,7 @@ class MsgHandler(object):
 
     def __init__(self, wp, default="success", crypto=False):
         # crypto 是否加密[False:明文(未加密) True:密文(已加密)]
-        # 通过设置crypto可以动态改变加解密模式
+        # 当crypto为True时WechatApp实例应包含aeskey
         self.wp = wp
         self.default = default
         self.crypto = crypto
@@ -75,11 +49,11 @@ class MsgHandler(object):
             # 密文通讯
             from ..wx_crypto.WXBizMsgCrypt import WXBizMsgCrypt
             self.msgcrypt = WXBizMsgCrypt(self.wp.token, self.wp.aeskey, self.wp.appid)
-            self.response = cipher_text_decorator(self.response)
+            self.response = cipher_decorator(self.__response__, self)
         else:
             # 明文通讯
             self.msgcrypt = None
-            self.response = clear_text_decorator(self.response)
+            self.response = self.__response__
 
     def route(self, msg_type):
         # msg_type是一个二元元祖,如("event", "click")
@@ -92,17 +66,30 @@ class MsgHandler(object):
         msg_type = self.convert(msg_type)
         self.register_funcs[msg_type] = func
 
-    def response(self, msg_type, xml_tree):
+    def __response__(self, xml, args=None):
         # 回复微信消息
+        xml_tree = ET.fromstring(xml)
         try:
-            msg_type = self.convert(msg_type)
-            return self.register_funcs[msg_type](xml_tree) or self.default
+            msg_type = xml_tree.find("MsgType").text
+        except AttributeError:
+            msg_type = ""
+        try:
+            event = xml_tree.find("Event").text
+        except AttributeError:
+            event = ""
+        try:
+            _msg_type = self.convert((msg_type, event))
+            return self.register_funcs[_msg_type](xml_tree) or self.default_response(xml_tree)
         except KeyError as e:
             logging.error(str(e))
-            return self.default
+            return self.default_response(xml_tree)
         except Exception as e:
             logging.error(str(e))
             raise e
+
+    def default_response(self, xml_tree):
+        return ReplyTemplate.TEXT % (xml_tree.find("FromUserName").text, 
+            xml_tree.find("ToUserName").text, int(time.time()), self.default)
 
     def convert(self, msg_type):
         msg_type = tuple([item.lower() for item in msg_type])
@@ -128,7 +115,7 @@ class MsgHandler(object):
         #param xml:post消息体中的xml字符串
         #param args:url上携带的参数字典
         if not auth:
-            return self.response(self, xml, args)
+            return self.response(xml, args)
         else:
             # 服务器接入验证
             return self.auth(args, self.wp.token)
@@ -159,66 +146,43 @@ class ReplyTemplate(object):
             """
     VOICE = """
             <xml>
-                <ToUserName><![CDATA[toUser]]></ToUserName>
-                <FromUserName><![CDATA[fromUser]]></FromUserName>
-                <CreateTime>12345678</CreateTime>
+                <ToUserName><![CDATA[%s]]></ToUserName>
+                <FromUserName><![CDATA[%s]]></FromUserName>
+                <CreateTime>%s</CreateTime>
                 <MsgType><![CDATA[voice]]></MsgType>
                 <Voice>
-                <MediaId><![CDATA[media_id]]></MediaId>
+                <MediaId><![CDATA[%s]]></MediaId>
                 </Voice>
             </xml>
             """
 
     VIDEO = """
             <xml>
-                <ToUserName><![CDATA[toUser]]></ToUserName>
-                <FromUserName><![CDATA[fromUser]]></FromUserName>
-                <CreateTime>12345678</CreateTime>
+                <ToUserName><![CDATA[%s]]></ToUserName>
+                <FromUserName><![CDATA[%s]]></FromUserName>
+                <CreateTime>%s</CreateTime>
                 <MsgType><![CDATA[video]]></MsgType>
                 <Video>
-                <MediaId><![CDATA[media_id]]></MediaId>
-                <Title><![CDATA[title]]></Title>
-                <Description><![CDATA[description]]></Description>
+                <MediaId><![CDATA[%s]]></MediaId>
+                <Title><![CDATA[%s]]></Title>
+                <Description><![CDATA[%s]]></Description>
                 </Video> 
             </xml>
             """
     MUSIC = """
             <xml>
-                <ToUserName><![CDATA[toUser]]></ToUserName>
-                <FromUserName><![CDATA[fromUser]]></FromUserName>
-                <CreateTime>12345678</CreateTime>
+                <ToUserName><![CDATA[%s]]></ToUserName>
+                <FromUserName><![CDATA[%s]]></FromUserName>
+                <CreateTime>%s</CreateTime>
                 <MsgType><![CDATA[music]]></MsgType>
                 <Music>
-                <Title><![CDATA[TITLE]]></Title>
-                <Description><![CDATA[DESCRIPTION]]></Description>
-                <MusicUrl><![CDATA[MUSIC_Url]]></MusicUrl>
-                <HQMusicUrl><![CDATA[HQ_MUSIC_Url]]></HQMusicUrl>
-                <ThumbMediaId><![CDATA[media_id]]></ThumbMediaId>
+                <Title><![CDATA[%s]]></Title>
+                <Description><![CDATA[%s]]></Description>
+                <MusicUrl><![CDATA[%s]]></MusicUrl>
+                <HQMusicUrl><![CDATA[%s]]></HQMusicUrl>
+                <ThumbMediaId><![CDATA[%s]]></ThumbMediaId>
                 </Music>
             </xml>
-            """
-    NEWS = """
-            <xml>
-                <ToUserName><![CDATA[toUser]]></ToUserName>
-                <FromUserName><![CDATA[fromUser]]></FromUserName>
-                <CreateTime>12345678</CreateTime>
-                <MsgType><![CDATA[news]]></MsgType>
-                <ArticleCount>2</ArticleCount>
-                <Articles>
-                <item>
-                <Title><![CDATA[title1]]></Title> 
-                <Description><![CDATA[description1]]></Description>
-                <PicUrl><![CDATA[picurl]]></PicUrl>
-                <Url><![CDATA[url]]></Url>
-                </item>
-                <item>
-                <Title><![CDATA[title]]></Title>
-                <Description><![CDATA[description]]></Description>
-                <PicUrl><![CDATA[picurl]]></PicUrl>
-                <Url><![CDATA[url]]></Url>
-                </item>
-                </Articles>
-            </xml> 
             """
 
 
