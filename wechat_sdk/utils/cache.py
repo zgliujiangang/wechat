@@ -3,6 +3,7 @@
 
 import os
 import time
+import abc
 try:
     import cPickle as pickle
 except ImportError:
@@ -10,16 +11,20 @@ except ImportError:
 
 
 class BaseCache(object):
-    # 缓存的基类
+    # 缓存的抽象基类
+    __metaclass__ = abc.ABCMeta
 
+    @abc.abstractmethod
     def set(self, key, value, expires_in=None):
-        return NotImplemented
+        pass
 
+    @abc.abstractmethod
     def get(self, key):
-        return NotImplemented
+        pass
 
+    @abc.abstractmethod
     def delete(self, key):
-        return NotImplemented
+        pass
 
 
 class PickleCacheData:

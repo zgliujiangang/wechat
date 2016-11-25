@@ -5,26 +5,12 @@
 import time
 import logging
 import hashlib
-from functools import wraps, partial
 try:
     import xml.etree.cElementTree as ET
 except ImportError:
     import xml.etree.ElementTree as ET
 from ..utils.common import random_str
 from ..urls import ApiUrl
-
-
-def cipher_decorator(fn, msg_handler):
-    # 密文模式装饰器
-    @wraps(fn)
-    def decorator(self, xml, args):
-        de_ret, xml = self.msgcrypt.DecryptMsg(xml, args.get("msg_signature"), 
-            args.get("timestamp"), args.get("nonce"))
-        response = fn(xml, args)
-        nonce = random_str(min_length=10, max_length=10)
-        en_ret, response = self.msgcrypt.EncryptMsg(response, nonce)
-        return response
-    return partial(decorator, msg_handler)
 
 
 class MsgHandler(object):
@@ -49,11 +35,11 @@ class MsgHandler(object):
             # 密文通讯
             from ..wx_crypto.WXBizMsgCrypt import WXBizMsgCrypt
             self.msgcrypt = WXBizMsgCrypt(self.wp.token, self.wp.aeskey, self.wp.appid)
-            self.response = cipher_decorator(self.__response__, self)
+            self.response = self.cipher_response
         else:
             # 明文通讯
             self.msgcrypt = None
-            self.response = self.__response__
+            self.response = self.clear_response
 
     def route(self, msg_type):
         # msg_type是一个二元元祖,如("event", "click")
@@ -66,8 +52,8 @@ class MsgHandler(object):
         msg_type = self.convert(msg_type)
         self.register_funcs[msg_type] = func
 
-    def __response__(self, xml, args=None):
-        # 回复微信消息
+    def clear_response(self, xml, args=None):
+        # 回复微信消息,明文通讯
         xml_tree = ET.fromstring(xml)
         try:
             msg_type = xml_tree.find("MsgType").text
@@ -86,6 +72,15 @@ class MsgHandler(object):
         except Exception as e:
             logging.error(str(e))
             raise e
+
+    def cipher_response(self, xml, args):
+        # 回复微信消息,密文通讯
+        de_ret, xml = self.msgcrypt.DecryptMsg(xml, args.get("msg_signature"), 
+            args.get("timestamp"), args.get("nonce"))
+        response = self.clear_response(xml, args)
+        nonce = random_str(min_length=10, max_length=10)
+        en_ret, response = self.msgcrypt.EncryptMsg(response, nonce)
+        return response
 
     def default_response(self, xml_tree):
         return ReplyTemplate.TEXT % (xml_tree.find("FromUserName").text, 
